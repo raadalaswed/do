@@ -2,103 +2,317 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>👤 صفحة اللاعب</title>
-
 <style>
-body {
-  font-family: Arial;
-  background: #0f172a;
-  color: white;
-  text-align: center;
-}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-.container {
-  width: 90%;
-  max-width: 700px;
-  margin: auto;
-}
+  body {
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+    min-height: 100vh;
+  }
 
-.card {
-  background: #1e293b;
-  padding: 20px;
-  margin: 15px 0;
-  border-radius: 12px;
-}
+  .page {
+    max-width: 600px;
+    margin: auto;
+    padding: 1.5rem 1rem 3rem;
+  }
 
-h1 {
-  margin-top: 20px;
-}
+  /* ── بطاقة الهوية ── */
+  .profile-card {
+    background: linear-gradient(135deg, #1e293b 0%, #0f2342 100%);
+    border: 1px solid #334155;
+    border-radius: 20px;
+    padding: 2rem 1.5rem 1.5rem;
+    margin-bottom: 14px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
 
-.stat {
-  margin: 10px;
-}
+  .profile-card::before {
+    content: '';
+    position: absolute;
+    top: -40px; left: -40px;
+    width: 160px; height: 160px;
+    background: rgba(59,130,246,0.08);
+    border-radius: 50%;
+  }
 
-.win { color: #22c55e; }
-.loss { color: #ef4444; }
+  .avatar {
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 auto 12px;
+    border: 3px solid #1e40af;
+    color: white;
+  }
 
-button {
-  padding: 10px 20px;
-  background: #3b82f6;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  color: white;
-}
+  .profile-name {
+    font-size: clamp(20px, 5vw, 26px);
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 6px;
+  }
 
-table {
-  width: 100%;
-  margin-top: 10px;
-  border-collapse: collapse;
-}
+  .league-badge {
+    display: inline-block;
+    background: rgba(99,102,241,0.2);
+    color: #a5b4fc;
+    border: 1px solid rgba(99,102,241,0.35);
+    border-radius: 20px;
+    padding: 3px 14px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
 
-td, th {
-  border-bottom: 1px solid #334155;
-  padding: 8px;
-}
+  .points-row {
+    background: rgba(59,130,246,0.12);
+    border: 1px solid rgba(59,130,246,0.25);
+    border-radius: 12px;
+    padding: 10px 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #60a5fa;
+  }
 
+  .points-row span { font-size: 13px; color: #94a3b8; font-weight: 400; }
+
+  /* ── كروت عامة ── */
+  .card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 16px;
+    padding: 1.1rem 1.25rem;
+    margin-bottom: 14px;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: #475569; }
+
+  .card-title {
+    font-size: 14px;
+    color: #94a3b8;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ── إحصائيات ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .stat-box {
+    background: #0f172a;
+    border-radius: 12px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-size: clamp(20px, 5vw, 26px);
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-lbl {
+    font-size: 11px;
+    color: #64748b;
+  }
+
+  .win-bar-wrap {
+    background: #0f172a;
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .win-bar-track {
+    flex: 1;
+    height: 6px;
+    background: #334155;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .win-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #22c55e, #16a34a);
+    border-radius: 4px;
+    transition: width 0.6s ease;
+  }
+
+  .win-rate-lbl { font-size: 13px; color: #22c55e; font-weight: 600; white-space: nowrap; }
+
+  .streak-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .streak-box {
+    flex: 1;
+    background: #0f172a;
+    border-radius: 12px;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .streak-box .s-num { font-size: 22px; font-weight: 700; color: #f97316; }
+  .streak-box .s-lbl { font-size: 11px; color: #64748b; margin-top: 2px; }
+
+  /* ── أفضل شريك ── */
+  .duo-box {
+    background: #0f172a;
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .duo-avatar {
+    width: 46px; height: 46px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .duo-name { font-size: 16px; font-weight: 600; color: #f1f5f9; }
+  .duo-wins { font-size: 12px; color: #22c55e; margin-top: 3px; }
+
+  /* ── جدول المباريات ── */
+  .matches-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 280px;
+  }
+
+  thead tr { background: #0f172a; }
+
+  th {
+    padding: 9px 10px;
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 10px;
+    font-size: 13px;
+    border-bottom: 1px solid #1e293b;
+    color: #cbd5e1;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .win  { background: rgba(34,197,94,0.15);  color: #22c55e; }
+  .loss { background: rgba(239,68,68,0.15);  color: #ef4444; }
+
+  /* ── زر الرجوع ── */
+  .back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 13px;
+    margin-top: 6px;
+    background: transparent;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    color: #cbd5e1;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .back-btn:hover { background: #1e293b; border-color: #475569; }
+  .back-btn:active { transform: scale(0.98); }
 </style>
-
 </head>
-
 <body>
+<div class="page">
 
-<h1>👤 صفحة اللاعب</h1>
+  <!-- بطاقة الهوية -->
+  <div class="profile-card" id="info">
+    <div class="avatar">؟</div>
+    <div class="profile-name">جاري التحميل...</div>
+  </div>
 
-<div class="container">
+  <!-- الإحصائيات -->
+  <div class="card">
+    <div class="card-title">📊 الإحصائيات</div>
+    <div id="stats">
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-num" style="color:#22c55e">-</div><div class="stat-lbl">فوز</div></div>
+        <div class="stat-box"><div class="stat-num" style="color:#ef4444">-</div><div class="stat-lbl">خسارة</div></div>
+        <div class="stat-box"><div class="stat-num" style="color:#60a5fa">-</div><div class="stat-lbl">المجموع</div></div>
+      </div>
+    </div>
+  </div>
 
-<div class="card" id="info"></div>
+  <!-- أفضل شريك -->
+  <div class="card">
+    <div class="card-title">👥 أفضل شريك</div>
+    <div id="duo"></div>
+  </div>
 
-<div class="card">
-<h3>📊 الإحصائيات</h3>
-<div id="stats"></div>
-</div>
+  <!-- آخر المباريات -->
+  <div class="card">
+    <div class="card-title">🎮 آخر المباريات</div>
+    <div class="matches-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>الفريق</th>
+            <th>ضد</th>
+            <th>النتيجة</th>
+          </tr>
+        </thead>
+        <tbody id="matches"></tbody>
+      </table>
+    </div>
+  </div>
 
-<div class="card">
-<h3>👥 أفضل شريك</h3>
-<div id="duo"></div>
-</div>
-
-<div class="card">
-<h3>🔥 آخر المباريات</h3>
-<table>
-<thead>
-<tr>
-<th>الفريق</th>
-<th>ضد</th>
-<th>النتيجة</th>
-</tr>
-</thead>
-<tbody id="matches"></tbody>
-</table>
-</div>
-
-<button onclick="goBack()">⬅ الرجوع</button>
-
+  <button class="back-btn" onclick="goBack()">⬅ الرجوع</button>
 </div>
 
 <script type="module">
-
-// 🔥 Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
@@ -115,108 +329,133 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// 📥 جلب اسم اللاعب من الرابط
 const params = new URLSearchParams(window.location.search);
 const playerName = params.get("name");
 
-// 🧮 تحديد الدوري
 function getLeagueName(league) {
   return "الدوري " + league;
 }
 
-// 🚀 تحميل البيانات
-async function loadPlayer() {
+function getInitials(name) {
+  return name ? name.charAt(0).toUpperCase() : "؟";
+}
 
-  // 📊 بيانات اللاعب
+async function loadPlayer() {
   const snapshot = await get(ref(db, "players/" + playerName));
   if (!snapshot.exists()) {
-    document.body.innerHTML = "❌ اللاعب غير موجود";
+    document.body.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:12px;color:#ef4444;font-size:18px;">
+        ❌ اللاعب غير موجود
+      </div>`;
     return;
   }
 
   const p = snapshot.val();
 
+  // بطاقة الهوية
   document.getElementById("info").innerHTML = `
-    <h2>${playerName}</h2>
-    <div class="stat">🏆 النقاط: ${p.points}</div>
-    <div class="stat">📊 ${getLeagueName(p.league)}</div>
+    <div class="avatar">${getInitials(playerName)}</div>
+    <div class="profile-name">${playerName}</div>
+    <div class="league-badge">🏅 ${getLeagueName(p.league)}</div>
+    <br>
+    <div class="points-row">🏆 ${p.points} <span>نقطة</span></div>
   `;
 
-  // 📈 إحصائيات
-  let total = (p.wins || 0) + (p.losses || 0);
-  let winRate = total ? Math.round((p.wins / total) * 100) : 0;
+  // الإحصائيات
+  const wins   = p.wins   || 0;
+  const losses = p.losses || 0;
+  const total  = wins + losses;
+  const winRate = total ? Math.round((wins / total) * 100) : 0;
 
   document.getElementById("stats").innerHTML = `
-    <div class="win">فوز: ${p.wins || 0}</div>
-    <div class="loss">خسارة: ${p.losses || 0}</div>
-    <div>🔥 streak: ${p.streak || 0}</div>
-    <div>⭐ أعلى streak: ${p.bestStreak || 0}</div>
-    <div>📊 win rate: ${winRate}%</div>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-num" style="color:#22c55e">${wins}</div>
+        <div class="stat-lbl">فوز</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color:#ef4444">${losses}</div>
+        <div class="stat-lbl">خسارة</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color:#60a5fa">${total}</div>
+        <div class="stat-lbl">المجموع</div>
+      </div>
+    </div>
+    <div class="win-bar-wrap">
+      <div class="win-bar-track">
+        <div class="win-bar-fill" style="width:${winRate}%"></div>
+      </div>
+      <div class="win-rate-lbl">${winRate}% فوز</div>
+    </div>
+    <div class="streak-row">
+      <div class="streak-box">
+        <div class="s-num">🔥 ${p.streak || 0}</div>
+        <div class="s-lbl">streak حالي</div>
+      </div>
+      <div class="streak-box">
+        <div class="s-num">⭐ ${p.bestStreak || 0}</div>
+        <div class="s-lbl">أعلى streak</div>
+      </div>
+    </div>
   `;
 
-  // 👥 أفضل شريك
+  // أفضل شريك
   const duoSnap = await get(ref(db, "duos"));
   let bestPartner = "لا يوجد";
   let bestWins = 0;
 
   if (duoSnap.exists()) {
-    let duos = duoSnap.val();
-
-    for (let key in duos) {
+    for (let key in duoSnap.val()) {
       let players = key.split("-");
-      if (players.includes(playerName)) {
-        if (duos[key].wins > bestWins) {
-          bestWins = duos[key].wins;
-          bestPartner = players.find(p => p !== playerName);
-        }
+      if (players.includes(playerName) && duoSnap.val()[key].wins > bestWins) {
+        bestWins = duoSnap.val()[key].wins;
+        bestPartner = players.find(pl => pl !== playerName);
       }
     }
   }
 
   document.getElementById("duo").innerHTML = `
-    🤝 ${bestPartner} (${bestWins} فوز)
+    <div class="duo-box">
+      <div class="duo-avatar">${getInitials(bestPartner)}</div>
+      <div>
+        <div class="duo-name">🤝 ${bestPartner}</div>
+        <div class="duo-wins">${bestWins} انتصار معاً</div>
+      </div>
+    </div>
   `;
 
-  // 🎮 آخر المباريات
+  // آخر المباريات
   const matchSnap = await get(ref(db, "matches"));
   let html = "";
 
   if (matchSnap.exists()) {
     let matches = Object.values(matchSnap.val()).reverse();
-
     for (let m of matches) {
-
       if (m.team1.includes(playerName) || m.team2.includes(playerName)) {
-
-        let isTeam1 = m.team1.includes(playerName);
-        let team = isTeam1 ? m.team1 : m.team2;
+        let isTeam1  = m.team1.includes(playerName);
+        let team     = isTeam1 ? m.team1 : m.team2;
         let opponent = isTeam1 ? m.team2 : m.team1;
-
-        let win = (isTeam1 && m.winner === 1) || (!isTeam1 && m.winner === 2);
-
+        let win      = (isTeam1 && m.winner === 1) || (!isTeam1 && m.winner === 2);
         html += `
-        <tr>
-          <td>${team.join(" + ")}</td>
-          <td>${opponent.join(" + ")}</td>
-          <td class="${win ? 'win' : 'loss'}">
-            ${win ? "فوز" : "خسارة"}
-          </td>
-        </tr>`;
+          <tr>
+            <td>${team.join(" + ")}</td>
+            <td>${opponent.join(" + ")}</td>
+            <td><span class="badge ${win ? 'win' : 'loss'}">${win ? "فوز" : "خسارة"}</span></td>
+          </tr>`;
       }
     }
   }
 
+  if (!html) html = `<tr><td colspan="3" style="text-align:center;color:#475569;padding:20px;">لا توجد مباريات بعد</td></tr>`;
   document.getElementById("matches").innerHTML = html;
 }
 
 loadPlayer();
 
-// 🔙 رجوع
 window.goBack = function() {
   window.location.href = "index.html";
 };
-
 </script>
-
 </body>
 </html>
