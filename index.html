@@ -2,155 +2,296 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-
-<!-- 📱 مهم للموبايل -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>🏆 دوري الدومينو</title>
-
 <style>
-body {
-  font-family: Arial;
-  background: #0f172a;
-  color: white;
-  text-align: center;
-}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-h1 {
-  margin-top: 20px;
-}
+  body {
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+    min-height: 100vh;
+  }
 
-button {
-  padding: 10px 20px;
-  margin: 6px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  color: white;
-}
+  /* ── الهيدر ── */
+  .header {
+    background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+    border-bottom: 1px solid #1e293b;
+    padding: 2rem 1rem 1.5rem;
+    text-align: center;
+  }
 
-.add { background: #22c55e; }
-.add:hover { background: #16a34a; }
+  .header-title {
+    font-size: clamp(22px, 6vw, 32px);
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 6px;
+  }
 
-.stats { background: #3b82f6; }
-.stats:hover { background: #2563eb; }
+  .header-sub {
+    font-size: 13px;
+    color: #475569;
+  }
 
-.admin { background: #f59e0b; }
-.admin:hover { background: #d97706; }
+  /* ── الأزرار ── */
+  .actions {
+    display: flex;
+    gap: 10px;
+    padding: 1.2rem 1rem;
+    max-width: 600px;
+    margin: auto;
+  }
 
-/* 📱 تحسين الجدول */
-.table-container {
-  overflow-x: auto;
-}
+  .btn {
+    flex: 1;
+    padding: 13px 8px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    color: white;
+    font-size: clamp(12px, 3.5vw, 14px);
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    transition: transform 0.15s, opacity 0.15s;
+  }
 
-table {
-  margin: 20px auto;
-  border-collapse: collapse;
-  width: 90%;
-  min-width: 600px;
-  background: #1e293b;
-  border-radius: 10px;
-  overflow: hidden;
-}
+  .btn:active { transform: scale(0.96); opacity: 0.85; }
+  .btn-icon { font-size: 20px; }
 
-th, td {
-  padding: 12px;
-  border-bottom: 1px solid #334155;
-}
+  .btn-green  { background: linear-gradient(135deg, #16a34a, #15803d); }
+  .btn-blue   { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+  .btn-amber  { background: linear-gradient(135deg, #d97706, #b45309); }
 
-th {
-  background: #020617;
-}
+  /* ── الصفحة الداخلية ── */
+  .page { max-width: 600px; margin: auto; padding: 0 1rem 3rem; }
 
-.win { color: #22c55e; }
-.loss { color: #ef4444; }
+  /* ── الدوريات ── */
+  .section-title {
+    font-size: 13px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 1.2rem 0 8px;
+  }
 
-.top { background: #065f46; }
-.bottom { background: #7f1d1d; }
+  .leagues-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 1.5rem;
+  }
 
-.streak { color: orange; }
+  .league-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 10px 6px;
+    text-align: center;
+  }
 
-a {
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-}
+  .league-card .l-icon { font-size: 18px; margin-bottom: 4px; }
+  .league-card .l-num  { font-size: 12px; font-weight: 700; color: #f1f5f9; margin-bottom: 2px; }
+  .league-card .l-pts  { font-size: 10px; color: #64748b; line-height: 1.3; }
 
-a:hover {
-  text-decoration: underline;
-}
+  /* ── بطاقة الجدول ── */
+  .table-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 16px;
+    overflow: hidden;
+  }
 
-/* 🏆 صندوق الدوريات */
-.leagues {
-  width: 90%;
-  margin: auto;
-}
+  .table-header {
+    background: #020617;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #334155;
+  }
 
-.league-box {
-  background: #1e293b;
-  margin: 5px 0;
-  padding: 8px;
-  border-radius: 8px;
-  font-size: 14px;
-}
+  .table-header-title { font-size: 14px; font-weight: 600; color: #94a3b8; }
 
-/* 📱 تحسين الموبايل */
-@media (max-width: 600px) {
-  button {
-    width: 90%;
+  .live-dot {
+    width: 7px; height: 7px;
+    background: #22c55e;
+    border-radius: 50%;
+    margin-right: auto;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.4; transform: scale(1.3); }
+  }
+
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 340px;
+  }
+
+  thead tr { background: #0f172a; }
+
+  th {
+    padding: 10px 12px;
+    font-size: 11px;
+    color: #475569;
+    font-weight: 500;
+    text-align: right;
+    white-space: nowrap;
+    border-bottom: 1px solid #334155;
+  }
+
+  td {
+    padding: 11px 12px;
+    font-size: 13px;
+    border-bottom: 1px solid #1a2640;
+    color: #cbd5e1;
+    white-space: nowrap;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr { transition: background 0.15s; }
+  tbody tr:hover td { background: rgba(255,255,255,0.03); }
+
+  /* صف الأول */
+  .row-top td { background: rgba(5,150,105,0.12); }
+  .row-top:hover td { background: rgba(5,150,105,0.18) !important; }
+
+  /* صفوف الأخيرين */
+  .row-bottom td { background: rgba(127,29,29,0.15); }
+  .row-bottom:hover td { background: rgba(127,29,29,0.22) !important; }
+
+  /* رتبة */
+  .rank-badge {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .rank-1 { background: rgba(234,179,8,0.2);  color: #fbbf24; }
+  .rank-2 { background: rgba(148,163,184,0.2); color: #94a3b8; }
+  .rank-3 { background: rgba(180,83,9,0.2);    color: #f97316; }
+  .rank-n { background: rgba(51,65,85,0.5);    color: #64748b; }
+
+  /* اسم اللاعب */
+  a {
+    color: #f1f5f9;
+    text-decoration: none;
+    font-weight: 600;
     font-size: 14px;
   }
 
-  th, td {
-    font-size: 12px;
-    padding: 8px;
+  a:hover { color: #60a5fa; }
+
+  .win    { color: #22c55e; font-weight: 600; }
+  .loss   { color: #ef4444; font-weight: 600; }
+  .streak { color: #f97316; font-weight: 600; }
+
+  /* شارة الدوري */
+  .league-pill {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(99,102,241,0.15);
+    color: #a5b4fc;
+    border: 1px solid rgba(99,102,241,0.25);
   }
-}
 </style>
-
 </head>
-
 <body>
 
-<h1>🏆 دوري الدومينو</h1>
-
-<!-- 🎮 الأزرار -->
-<button class="add" onclick="goToAddMatch()">➕ إضافة مباراة</button>
-<button class="stats" onclick="goToStats()">📊 الإحصائيات</button>
-<button class="admin" onclick="goToAdmin()">🧑‍💻 لوحة الإدارة</button>
-
-<!-- 🏆 جديد: توضيح الدوريات -->
-<div class="leagues">
-  <div class="league-box">🥇 الدوري 1: 300+ نقطة</div>
-  <div class="league-box">🥈 الدوري 2: 200 - 299</div>
-  <div class="league-box">🥉 الدوري 3: 120 - 199</div>
-  <div class="league-box">4️⃣ الدوري 4: 60 - 119</div>
-  <div class="league-box">5️⃣ الدوري 5: أقل من 60</div>
+<!-- الهيدر -->
+<div class="header">
+  <div class="header-title">🏆 دوري الدومينو</div>
+  <div class="header-sub">جدول الترتيب المباشر</div>
 </div>
 
-<h2>📊 جدول الترتيب</h2>
+<!-- الأزرار -->
+<div class="actions">
+  <button class="btn btn-green" onclick="goToAddMatch()">
+    <span class="btn-icon">➕</span> إضافة مباراة
+  </button>
+  <button class="btn btn-blue" onclick="goToStats()">
+    <span class="btn-icon">📊</span> الإحصائيات
+  </button>
+  <button class="btn btn-amber" onclick="goToAdmin()">
+    <span class="btn-icon">🧑‍💻</span> الإدارة
+  </button>
+</div>
 
-<!-- 📱 لف الجدول -->
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th>الترتيب</th>
-<th>اللاعب</th>
-<th>النقاط</th>
-<th>الدوري</th>
-<th>فوز</th>
-<th>خسارة</th>
-<th>🔥 streak</th>
-</tr>
-</thead>
-<tbody id="table"></tbody>
-</table>
+<div class="page">
+
+  <!-- الدوريات -->
+  <div class="section-title">مستويات الدوري</div>
+  <div class="leagues-grid">
+    <div class="league-card">
+      <div class="l-icon">🥇</div>
+      <div class="l-num">الأول</div>
+      <div class="l-pts">300+</div>
+    </div>
+    <div class="league-card">
+      <div class="l-icon">🥈</div>
+      <div class="l-num">الثاني</div>
+      <div class="l-pts">200–299</div>
+    </div>
+    <div class="league-card">
+      <div class="l-icon">🥉</div>
+      <div class="l-num">الثالث</div>
+      <div class="l-pts">120–199</div>
+    </div>
+    <div class="league-card">
+      <div class="l-icon">4️⃣</div>
+      <div class="l-num">الرابع</div>
+      <div class="l-pts">60–119</div>
+    </div>
+    <div class="league-card">
+      <div class="l-icon">5️⃣</div>
+      <div class="l-num">الخامس</div>
+      <div class="l-pts">أقل من 60</div>
+    </div>
+  </div>
+
+  <!-- جدول الترتيب -->
+  <div class="table-card">
+    <div class="table-header">
+      <span class="table-header-title">📊 جدول الترتيب</span>
+      <div class="live-dot" title="يتحدث كل 5 ثوانٍ"></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>اللاعب</th>
+            <th>النقاط</th>
+            <th>الدوري</th>
+            <th>فوز</th>
+            <th>خسارة</th>
+            <th>🔥</th>
+          </tr>
+        </thead>
+        <tbody id="table"></tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <script type="module">
-
-// 🔥 Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
@@ -167,41 +308,28 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// 🧮 تحديد الدوري
 function getLeague(points) {
   if (points >= 300) return 1;
   if (points >= 200) return 2;
   if (points >= 120) return 3;
-  if (points >= 60) return 4;
+  if (points >= 60)  return 4;
   return 5;
 }
 
-// 📅 نهاية الموسم (كل جمعة)
 async function checkSeasonEnd() {
   const today = new Date();
-
   if (today.getDay() === 5) {
-
     const snapshot = await get(ref(db, "players"));
     if (!snapshot.exists()) return;
-
     let players = snapshot.val();
-
-    let list = Object.entries(players).map(([name, data]) => ({
-      name,
-      ...data
-    }));
-
+    let list = Object.entries(players).map(([name, data]) => ({ name, ...data }));
     list.sort((a, b) => b.points - a.points);
-
     if (list.length >= 4) {
       list[0].points += 20;
       list[1].points += 10;
-
       list[list.length - 1].points -= 20;
       list[list.length - 2].points -= 10;
     }
-
     for (let p of list) {
       p.league = getLeague(p.points);
       await set(ref(db, "players/" + p.name), p);
@@ -209,50 +337,43 @@ async function checkSeasonEnd() {
   }
 }
 
-// 📊 تحميل اللاعبين
+function rankBadge(i) {
+  if (i === 0) return `<span class="rank-badge rank-1">🥇</span>`;
+  if (i === 1) return `<span class="rank-badge rank-2">🥈</span>`;
+  if (i === 2) return `<span class="rank-badge rank-3">🥉</span>`;
+  return `<span class="rank-badge rank-n">${i + 1}</span>`;
+}
+
 async function loadPlayers() {
-
   await checkSeasonEnd();
-
   const snapshot = await get(ref(db, "players"));
 
   if (!snapshot.exists()) {
     document.getElementById("table").innerHTML =
-      "<tr><td colspan='7'>لا يوجد لاعبين</td></tr>";
+      `<tr><td colspan="7" style="text-align:center;color:#475569;padding:24px;">لا يوجد لاعبين بعد</td></tr>`;
     return;
   }
 
-  let players = snapshot.val();
-
-  let list = Object.entries(players).map(([name, data]) => ({
-    name,
-    ...data
-  }));
-
-  list.sort((a, b) => b.points - a.points);
+  let list = Object.entries(snapshot.val())
+    .map(([name, data]) => ({ name, ...data }))
+    .sort((a, b) => b.points - a.points);
 
   let html = "";
-
-  list.forEach((p, index) => {
-
+  list.forEach((p, i) => {
     let rowClass = "";
-    if (index === 0) rowClass = "top";
-    if (index >= list.length - 2) rowClass = "bottom";
+    if (i === 0) rowClass = "row-top";
+    else if (i >= list.length - 2) rowClass = "row-bottom";
 
     html += `
-    <tr class="${rowClass}">
-      <td>${index + 1}</td>
-      <td>
-        <a href="player.html?name=${p.name}">
-          ${p.name}
-        </a>
-      </td>
-      <td>${p.points}</td>
-      <td>الدوري ${p.league}</td>
-      <td class="win">${p.wins || 0}</td>
-      <td class="loss">${p.losses || 0}</td>
-      <td class="streak">🔥 ${p.streak || 0}</td>
-    </tr>`;
+      <tr class="${rowClass}">
+        <td>${rankBadge(i)}</td>
+        <td><a href="player.html?name=${p.name}">${p.name}</a></td>
+        <td style="font-weight:700;color:#f1f5f9;">${p.points}</td>
+        <td><span class="league-pill">الدوري ${p.league}</span></td>
+        <td class="win">${p.wins || 0}</td>
+        <td class="loss">${p.losses || 0}</td>
+        <td class="streak">${p.streak || 0}</td>
+      </tr>`;
   });
 
   document.getElementById("table").innerHTML = html;
@@ -260,23 +381,12 @@ async function loadPlayers() {
 
 loadPlayers();
 setInterval(loadPlayers, 5000);
-
 </script>
 
 <script>
-
-function goToAddMatch() {
-  window.location.href = "add-match.html";
-}
-
-function goToStats() {
-  window.location.href = "stats.html";
-}
-
-function goToAdmin() {
-  window.location.href = "admin.html";
-}
-
+function goToAddMatch() { window.location.href = "add-match.html"; }
+function goToStats()    { window.location.href = "stats.html"; }
+function goToAdmin()    { window.location.href = "admin.html"; }
 </script>
 
 </body>
