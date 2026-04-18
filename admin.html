@@ -12,23 +12,15 @@ body {
   text-align: center;
 }
 
-.container {
-  width: 90%;
-  max-width: 800px;
-  margin: auto;
-}
-
-.card {
-  background: #1e293b;
-  padding: 20px;
-  margin: 15px 0;
-  border-radius: 12px;
+/* 🔐 Login */
+#loginBox {
+  margin-top: 120px;
 }
 
 input {
   padding: 10px;
-  margin: 5px;
-  width: 70%;
+  margin: 8px;
+  width: 250px;
   border-radius: 8px;
   border: none;
 }
@@ -36,30 +28,55 @@ input {
 button {
   padding: 10px 15px;
   margin: 5px;
-  background: #22c55e;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   color: white;
 }
 
-button.delete {
-  background: #ef4444;
+.green { background: #22c55e; }
+.red { background: #ef4444; }
+.blue { background: #3b82f6; }
+.orange { background: #f59e0b; }
+
+/* 📊 Dashboard */
+.container {
+  width: 90%;
+  max-width: 1000px;
+  margin: auto;
+  display: none;
 }
 
-button:hover {
-  opacity: 0.8;
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 20px 0;
 }
 
+.card {
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+/* Tables */
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
+  background: #1e293b;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 th, td {
+  padding: 10px;
   border-bottom: 1px solid #334155;
-  padding: 8px;
+}
+
+th {
+  background: #020617;
 }
 </style>
 
@@ -67,19 +84,37 @@ th, td {
 
 <body>
 
-<h1>🧑‍💻 لوحة الإدارة</h1>
+<!-- 🔐 LOGIN -->
+<div id="loginBox">
+  <h2>🔐 دخول لوحة الإدارة</h2>
+  <input type="password" id="pass" placeholder="أدخل كلمة السر">
+  <br>
+  <button class="green" onclick="login()">دخول</button>
+</div>
 
-<div class="container">
+<!-- 📊 DASHBOARD -->
+<div class="container" id="dashboard">
+
+<h2>🧑‍💻 لوحة التحكم</h2>
+
+<button class="red" onclick="logout()">🚪 تسجيل خروج</button>
+
+<!-- 📊 Stats -->
+<div class="cards">
+  <div class="card">👥 اللاعبين<br><span id="playersCount">0</span></div>
+  <div class="card">🎮 المباريات<br><span id="matchesCount">0</span></div>
+  <div class="card">🏆 أعلى لاعب<br><span id="bestPlayer">-</span></div>
+  <div class="card">🔥 أعلى نقاط<br><span id="bestPoints">0</span></div>
+</div>
 
 <!-- ➕ إضافة لاعب -->
 <div class="card">
 <h3>➕ إضافة لاعب</h3>
-<input id="newName" placeholder="اسم اللاعب">
-<button onclick="addPlayer()">إضافة</button>
+<input id="newPlayer" placeholder="اسم اللاعب">
+<button class="green" onclick="addPlayer()">إضافة</button>
 </div>
 
-<!-- 📊 تعديل / حذف لاعبين -->
-<div class="card">
+<!-- 👥 اللاعبين -->
 <h3>📊 إدارة اللاعبين</h3>
 <table>
 <thead>
@@ -92,23 +127,19 @@ th, td {
 </thead>
 <tbody id="playersTable"></tbody>
 </table>
-</div>
 
 <!-- 🎮 المباريات -->
-<div class="card">
 <h3>🎮 إدارة المباريات</h3>
 <table>
 <thead>
 <tr>
 <th>الفريق 1</th>
 <th>الفريق 2</th>
-<th>الفائز</th>
 <th>حذف</th>
 </tr>
 </thead>
 <tbody id="matchesTable"></tbody>
 </table>
-</div>
 
 </div>
 
@@ -116,7 +147,7 @@ th, td {
 
 // 🔥 Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getDatabase, ref, get, set, remove, update, push } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+import { getDatabase, ref, get, set, remove, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC7EVNCSl48CQgIC_a8wdC5UG2tKLtNKjQ",
@@ -131,19 +162,67 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-//
-// 🧠 PLAYERS
-//
+const PASSWORD = "88888888";
 
-async function loadPlayers() {
-  const snapshot = await get(ref(db, "players"));
-  if (!snapshot.exists()) return;
+// 🔐 Login
+window.login = function () {
+  let pass = document.getElementById("pass").value;
 
-  let data = snapshot.val();
+  if (pass === PASSWORD) {
+    localStorage.setItem("admin", "true");
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+    loadData();
+  } else {
+    alert("كلمة سر خاطئة ❌");
+  }
+};
+
+// 🚪 Logout
+window.logout = function () {
+  localStorage.removeItem("admin");
+  location.reload();
+};
+
+// 🔒 حماية الصفحة
+if (localStorage.getItem("admin") === "true") {
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("dashboard").style.display = "block";
+  loadData();
+}
+
+// 📊 تحميل كل البيانات
+async function loadData() {
+
+  const playersSnap = await get(ref(db, "players"));
+  const matchesSnap = await get(ref(db, "matches"));
+
+  let players = playersSnap.exists() ? playersSnap.val() : {};
+  let matches = matchesSnap.exists() ? matchesSnap.val() : {};
+
+  // 📊 Stats
+  document.getElementById("playersCount").innerText = Object.keys(players).length;
+  document.getElementById("matchesCount").innerText = Object.keys(matches).length;
+
+  // 🏆 أفضل لاعب
+  let best = "-";
+  let bestPoints = 0;
+
+  for (let p in players) {
+    if (players[p].points > bestPoints) {
+      bestPoints = players[p].points;
+      best = p;
+    }
+  }
+
+  document.getElementById("bestPlayer").innerText = best;
+  document.getElementById("bestPoints").innerText = bestPoints;
+
+  // 👥 players table
   let html = "";
 
-  for (let name in data) {
-    let p = data[name];
+  for (let name in players) {
+    let p = players[name];
 
     html += `
     <tr>
@@ -151,24 +230,37 @@ async function loadPlayers() {
       <td>
         <input id="p_${name}" value="${p.points}">
       </td>
-      <td>
-        <button onclick="updatePlayer('${name}')">تحديث</button>
-      </td>
-      <td>
-        <button class="delete" onclick="deletePlayer('${name}')">حذف</button>
-      </td>
+      <td><button class="blue" onclick="updatePlayer('${name}')">تحديث</button></td>
+      <td><button class="red" onclick="deletePlayer('${name}')">حذف</button></td>
     </tr>`;
   }
 
   document.getElementById("playersTable").innerHTML = html;
+
+  // 🎮 matches table
+  let mhtml = "";
+
+  for (let id in matches) {
+    let m = matches[id];
+
+    mhtml += `
+    <tr>
+      <td>${m.team1.join(" + ")}</td>
+      <td>${m.team2.join(" + ")}</td>
+      <td><button class="red" onclick="deleteMatch('${id}')">حذف</button></td>
+    </tr>`;
+  }
+
+  document.getElementById("matchesTable").innerHTML = mhtml;
 }
 
-window.addPlayer = async function() {
-  let name = document.getElementById("newName").value.trim();
-  if (!name) return alert("ادخل اسم اللاعب");
+// ➕ إضافة لاعب
+window.addPlayer = async function () {
+  let name = document.getElementById("newPlayer").value;
+
+  if (!name) return alert("ادخل اسم");
 
   await set(ref(db, "players/" + name), {
-    name,
     points: 0,
     wins: 0,
     losses: 0,
@@ -177,63 +269,31 @@ window.addPlayer = async function() {
     league: 5
   });
 
-  loadPlayers();
-}
+  loadData();
+};
 
-window.updatePlayer = async function(name) {
+// ✏️ تحديث لاعب
+window.updatePlayer = async function (name) {
   let points = document.getElementById("p_" + name).value;
 
   await update(ref(db, "players/" + name), {
     points: Number(points)
   });
 
-  alert("تم التحديث");
-  loadPlayers();
-}
+  loadData();
+};
 
-window.deletePlayer = async function(name) {
+// 🗑️ حذف لاعب
+window.deletePlayer = async function (name) {
   await remove(ref(db, "players/" + name));
-  loadPlayers();
-}
+  loadData();
+};
 
-//
-// 🎮 MATCHES
-//
-
-async function loadMatches() {
-  const snapshot = await get(ref(db, "matches"));
-  if (!snapshot.exists()) return;
-
-  let data = snapshot.val();
-  let html = "";
-
-  for (let key in data) {
-    let m = data[key];
-
-    html += `
-    <tr>
-      <td>${m.team1.join(" + ")}</td>
-      <td>${m.team2.join(" + ")}</td>
-      <td>${m.winner}</td>
-      <td>
-        <button class="delete" onclick="deleteMatch('${key}')">حذف</button>
-      </td>
-    </tr>`;
-  }
-
-  document.getElementById("matchesTable").innerHTML = html;
-}
-
-window.deleteMatch = async function(id) {
+// 🗑️ حذف مباراة
+window.deleteMatch = async function (id) {
   await remove(ref(db, "matches/" + id));
-  loadMatches();
-}
-
-//
-// 🚀 تشغيل
-//
-loadPlayers();
-loadMatches();
+  loadData();
+};
 
 </script>
 
