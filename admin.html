@@ -12,7 +12,6 @@ body {
   text-align: center;
 }
 
-/* 🔐 Login */
 #loginBox {
   margin-top: 120px;
 }
@@ -39,9 +38,8 @@ button {
 .blue { background: #3b82f6; }
 .orange { background: #f59e0b; }
 
-/* 📊 Dashboard */
 .container {
-  width: 90%;
+  width: 95%;
   max-width: 1000px;
   margin: auto;
   display: none;
@@ -60,7 +58,6 @@ button {
   border-radius: 10px;
 }
 
-/* Tables */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -87,7 +84,7 @@ th {
 <!-- 🔐 LOGIN -->
 <div id="loginBox">
   <h2>🔐 دخول لوحة الإدارة</h2>
-  <input type="password" id="pass" placeholder="أدخل كلمة السر">
+  <input type="password" id="pass" placeholder="كلمة السر">
   <br>
   <button class="green" onclick="login()">دخول</button>
 </div>
@@ -99,15 +96,25 @@ th {
 
 <button class="red" onclick="logout()">🚪 تسجيل خروج</button>
 
+<!-- 🏁 الموسم -->
+<button class="orange" onclick="endSeason()">🏁 إنهاء الموسم</button>
+<button class="blue" onclick="newSeason()">🔄 بداية موسم جديد</button>
+
+<!-- 📦 الموسم الحالي -->
+<div class="card">
+<h3>📦 الموسم الحالي</h3>
+<div id="currentSeasonInfo">تحميل...</div>
+</div>
+
 <!-- 📊 Stats -->
 <div class="cards">
   <div class="card">👥 اللاعبين<br><span id="playersCount">0</span></div>
   <div class="card">🎮 المباريات<br><span id="matchesCount">0</span></div>
-  <div class="card">🏆 أعلى لاعب<br><span id="bestPlayer">-</span></div>
+  <div class="card">🏆 الأول حالياً<br><span id="bestPlayer">-</span></div>
   <div class="card">🔥 أعلى نقاط<br><span id="bestPoints">0</span></div>
 </div>
 
-<!-- ➕ إضافة لاعب -->
+<!-- ➕ لاعب -->
 <div class="card">
 <h3>➕ إضافة لاعب</h3>
 <input id="newPlayer" placeholder="اسم اللاعب">
@@ -115,7 +122,7 @@ th {
 </div>
 
 <!-- 👥 اللاعبين -->
-<h3>📊 إدارة اللاعبين</h3>
+<h3>📊 اللاعبين</h3>
 <table>
 <thead>
 <tr>
@@ -128,26 +135,28 @@ th {
 <tbody id="playersTable"></tbody>
 </table>
 
-<!-- 🎮 المباريات -->
-<h3>🎮 إدارة المباريات</h3>
+<!-- 🏆 أرشيف المواسم -->
+<h3>📦 أرشيف المواسم</h3>
 <table>
 <thead>
 <tr>
-<th>الفريق 1</th>
-<th>الفريق 2</th>
-<th>حذف</th>
+<th>الموسم</th>
+<th>الأول</th>
+<th>النقاط</th>
+<th>التاريخ</th>
 </tr>
 </thead>
-<tbody id="matchesTable"></tbody>
+<tbody id="seasonsTable"></tbody>
 </table>
 
 </div>
 
 <script type="module">
 
-// 🔥 Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getDatabase, ref, get, set, remove, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+import {
+  getDatabase, ref, get, set, remove, update, push
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC7EVNCSl48CQgIC_a8wdC5UG2tKLtNKjQ",
@@ -172,9 +181,9 @@ window.login = function () {
     localStorage.setItem("admin", "true");
     document.getElementById("loginBox").style.display = "none";
     document.getElementById("dashboard").style.display = "block";
-    loadData();
+    loadAll();
   } else {
-    alert("كلمة سر خاطئة ❌");
+    alert("خطأ ❌");
   }
 };
 
@@ -184,95 +193,110 @@ window.logout = function () {
   location.reload();
 };
 
-// 🔒 حماية الصفحة
+// 🔒 auto login
 if (localStorage.getItem("admin") === "true") {
   document.getElementById("loginBox").style.display = "none";
   document.getElementById("dashboard").style.display = "block";
-  loadData();
+  loadAll();
 }
 
-// 📊 تحميل كل البيانات
-async function loadData() {
+// 📊 تحميل كل شيء
+async function loadAll() {
+  loadPlayers();
+  loadSeasons();
+  loadStats();
+}
 
-  const playersSnap = await get(ref(db, "players"));
-  const matchesSnap = await get(ref(db, "matches"));
+// 📊 اللاعبين
+async function loadPlayers() {
+  const snap = await get(ref(db, "players"));
+  if (!snap.exists()) return;
 
-  let players = playersSnap.exists() ? playersSnap.val() : {};
-  let matches = matchesSnap.exists() ? matchesSnap.val() : {};
-
-  // 📊 Stats
-  document.getElementById("playersCount").innerText = Object.keys(players).length;
-  document.getElementById("matchesCount").innerText = Object.keys(matches).length;
-
-  // 🏆 أفضل لاعب
-  let best = "-";
-  let bestPoints = 0;
-
-  for (let p in players) {
-    if (players[p].points > bestPoints) {
-      bestPoints = players[p].points;
-      best = p;
-    }
-  }
-
-  document.getElementById("bestPlayer").innerText = best;
-  document.getElementById("bestPoints").innerText = bestPoints;
-
-  // 👥 players table
+  let data = snap.val();
   let html = "";
 
-  for (let name in players) {
-    let p = players[name];
+  for (let name in data) {
+    let p = data[name];
 
     html += `
     <tr>
       <td>${name}</td>
-      <td>
-        <input id="p_${name}" value="${p.points}">
-      </td>
+      <td><input id="p_${name}" value="${p.points}"></td>
       <td><button class="blue" onclick="updatePlayer('${name}')">تحديث</button></td>
       <td><button class="red" onclick="deletePlayer('${name}')">حذف</button></td>
     </tr>`;
   }
 
   document.getElementById("playersTable").innerHTML = html;
+}
 
-  // 🎮 matches table
-  let mhtml = "";
+// 📦 أرشيف المواسم
+async function loadSeasons() {
+  const snap = await get(ref(db, "seasons"));
+  if (!snap.exists()) return;
 
-  for (let id in matches) {
-    let m = matches[id];
+  let data = snap.val();
+  let html = "";
 
-    mhtml += `
+  for (let id in data) {
+    let s = data[id];
+
+    html += `
     <tr>
-      <td>${m.team1.join(" + ")}</td>
-      <td>${m.team2.join(" + ")}</td>
-      <td><button class="red" onclick="deleteMatch('${id}')">حذف</button></td>
+      <td>${id}</td>
+      <td>${s.bestPlayer}</td>
+      <td>${s.bestPoints}</td>
+      <td>${s.date}</td>
     </tr>`;
   }
 
-  document.getElementById("matchesTable").innerHTML = mhtml;
+  document.getElementById("seasonsTable").innerHTML = html;
 }
 
-// ➕ إضافة لاعب
+// 📊 stats
+async function loadStats() {
+  const snap = await get(ref(db, "players"));
+  if (!snap.exists()) return;
+
+  let data = snap.val();
+
+  let count = Object.keys(data).length;
+  document.getElementById("playersCount").innerText = count;
+
+  let best = "-";
+  let bestP = 0;
+
+  for (let p in data) {
+    if (data[p].points > bestP) {
+      bestP = data[p].points;
+      best = p;
+    }
+  }
+
+  document.getElementById("bestPlayer").innerText = best;
+  document.getElementById("bestPoints").innerText = bestP;
+
+  document.getElementById("currentSeasonInfo").innerText =
+    "النظام يعمل بشكل طبيعي - النقاط لا تُصفّر";
+}
+
+// ➕ لاعب
 window.addPlayer = async function () {
   let name = document.getElementById("newPlayer").value;
-
-  if (!name) return alert("ادخل اسم");
+  if (!name) return;
 
   await set(ref(db, "players/" + name), {
     points: 0,
     wins: 0,
     losses: 0,
     streak: 0,
-    bestStreak: 0,
     league: 5
   });
 
-  loadData();
+  loadAll();
 };
 
-// ✏️ تحديث لاعب
+// ✏️ تحديث
 window.updatePlayer = async function (name) {
   let points = document.getElementById("p_" + name).value;
 
@@ -280,19 +304,49 @@ window.updatePlayer = async function (name) {
     points: Number(points)
   });
 
-  loadData();
+  loadAll();
 };
 
 // 🗑️ حذف لاعب
 window.deletePlayer = async function (name) {
   await remove(ref(db, "players/" + name));
-  loadData();
+  loadAll();
 };
 
-// 🗑️ حذف مباراة
-window.deleteMatch = async function (id) {
-  await remove(ref(db, "matches/" + id));
-  loadData();
+// 🏁 إنهاء الموسم (أرشفة فقط)
+window.endSeason = async function () {
+
+  const snap = await get(ref(db, "players"));
+  if (!snap.exists()) return;
+
+  let data = snap.val();
+
+  let best = "-";
+  let bestP = 0;
+
+  for (let p in data) {
+    if (data[p].points > bestP) {
+      bestP = data[p].points;
+      best = p;
+    }
+  }
+
+  let seasonId = "Season_" + Date.now();
+
+  await set(ref(db, "seasons/" + seasonId), {
+    bestPlayer: best,
+    bestPoints: bestP,
+    date: new Date().toLocaleDateString()
+  });
+
+  alert("تم إنهاء الموسم وحفظه 📦");
+  loadAll();
+};
+
+// 🔄 بداية موسم جديد (لا تصفير نقاط)
+window.newSeason = function () {
+  alert("تم بدء موسم جديد 🔄 (النقاط لم تتغير)");
+  loadAll();
 };
 
 </script>
