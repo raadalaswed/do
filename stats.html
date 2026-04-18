@@ -2,84 +2,163 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>📊 الإحصائيات</title>
-
 <style>
-body {
-  font-family: Arial;
-  background: #0f172a;
-  color: white;
-  text-align: center;
-}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-.container {
-  width: 90%;
-  max-width: 700px;
-  margin: auto;
-}
+  body {
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+    min-height: 100vh;
+  }
 
-.card {
-  background: #1e293b;
-  padding: 20px;
-  margin: 15px 0;
-  border-radius: 12px;
-}
+  .page {
+    max-width: 600px;
+    margin: auto;
+    padding: 1.5rem 1rem 2rem;
+  }
 
-h1 {
-  margin-top: 20px;
-}
+  .page-title {
+    font-size: clamp(18px, 5vw, 24px);
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #f1f5f9;
+    letter-spacing: 0.3px;
+  }
 
-.highlight {
-  font-size: 20px;
-  color: #22c55e;
-  font-weight: bold;
-}
+  .card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: border-color 0.2s;
+  }
 
-button {
-  padding: 10px 20px;
-  background: #3b82f6;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  color: white;
-}
+  .card:hover { border-color: #475569; }
+
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .icon-gold   { background: rgba(234, 179, 8, 0.15); }
+  .icon-blue   { background: rgba(59, 130, 246, 0.15); }
+  .icon-red    { background: rgba(239, 68, 68, 0.15); }
+  .icon-purple { background: rgba(168, 85, 247, 0.15); }
+
+  .card-body { flex: 1; min-width: 0; }
+
+  .card-label {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 4px;
+  }
+
+  .card-value {
+    font-size: clamp(14px, 4vw, 17px);
+    font-weight: 600;
+    color: #f1f5f9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-value .score {
+    color: #22c55e;
+    font-size: 0.88em;
+    font-weight: 400;
+    margin-right: 6px;
+  }
+
+  .loading-dot::after {
+    content: '...';
+    animation: dots 1.2s steps(4, end) infinite;
+  }
+
+  @keyframes dots {
+    0%,20%  { content: '.'; }
+    40%     { content: '..'; }
+    60%,100%{ content: '...'; }
+  }
+
+  .back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 13px;
+    margin-top: 6px;
+    background: transparent;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    color: #cbd5e1;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .back-btn:hover {
+    background: #1e293b;
+    border-color: #475569;
+  }
+
+  .back-btn:active { transform: scale(0.98); }
 </style>
-
 </head>
-
 <body>
+<div class="page">
+  <h1 class="page-title">📊 الإحصائيات العامة</h1>
 
-<h1>📊 الإحصائيات العامة</h1>
+  <div class="card">
+    <div class="card-icon icon-gold">🥇</div>
+    <div class="card-body">
+      <div class="card-label">أفضل لاعب</div>
+      <div class="card-value" id="bestPlayer"><span class="loading-dot"></span></div>
+    </div>
+  </div>
 
-<div class="container">
+  <div class="card">
+    <div class="card-icon icon-blue">👥</div>
+    <div class="card-body">
+      <div class="card-label">أفضل ثنائي</div>
+      <div class="card-value" id="bestDuo"><span class="loading-dot"></span></div>
+    </div>
+  </div>
 
-<div class="card">
-<h3>🥇 أفضل لاعب</h3>
-<div id="bestPlayer" class="highlight"></div>
-</div>
+  <div class="card">
+    <div class="card-icon icon-red">🔥</div>
+    <div class="card-body">
+      <div class="card-label">أعلى سلسلة انتصارات</div>
+      <div class="card-value" id="bestStreak"><span class="loading-dot"></span></div>
+    </div>
+  </div>
 
-<div class="card">
-<h3>👥 أفضل ثنائي</h3>
-<div id="bestDuo" class="highlight"></div>
-</div>
+  <div class="card">
+    <div class="card-icon icon-purple">⚔️</div>
+    <div class="card-body">
+      <div class="card-label">أكثر مواجهة</div>
+      <div class="card-value" id="bestMatchup"><span class="loading-dot"></span></div>
+    </div>
+  </div>
 
-<div class="card">
-<h3>🔥 أعلى سلسلة انتصارات</h3>
-<div id="bestStreak" class="highlight"></div>
-</div>
-
-<div class="card">
-<h3>⚔️ أكثر مواجهة</h3>
-<div id="bestMatchup" class="highlight"></div>
-</div>
-
-<button onclick="goBack()">⬅ الرجوع</button>
-
+  <button class="back-btn" onclick="goBack()">⬅ الرجوع</button>
 </div>
 
 <script type="module">
-
-// 🔥 Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
@@ -96,67 +175,44 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// 🚀 تحميل الإحصائيات
-async function loadStats() {
+function setVal(id, name, score) {
+  document.getElementById(id).innerHTML =
+    `${name} <span class="score">(${score})</span>`;
+}
 
-  // 🥇 أفضل لاعب
+async function loadStats() {
   const pSnap = await get(ref(db, "players"));
   if (pSnap.exists()) {
     let players = Object.entries(pSnap.val());
 
     players.sort((a, b) => b[1].points - a[1].points);
+    setVal("bestPlayer", players[0][0], `${players[0][1].points} نقطة`);
 
-    let best = players[0];
-    document.getElementById("bestPlayer").innerText =
-      `${best[0]} (${best[1].points} نقطة)`;
+    players.sort((a, b) => (b[1].bestStreak || 0) - (a[1].bestStreak || 0));
+    setVal("bestStreak", players[0][0], `${players[0][1].bestStreak || 0} انتصار متتالي`);
   }
 
-  // 👥 أفضل ثنائي
   const dSnap = await get(ref(db, "duos"));
   if (dSnap.exists()) {
     let duos = Object.entries(dSnap.val());
-
     duos.sort((a, b) => b[1].wins - a[1].wins);
-
-    let best = duos[0];
-    document.getElementById("bestDuo").innerText =
-      `${best[0].replace("-", " + ")} (${best[1].wins} فوز)`;
+    setVal("bestDuo", duos[0][0].replace("-", " + "), `${duos[0][1].wins} فوز`);
   }
 
-  // 🔥 أعلى streak
-  if (pSnap.exists()) {
-    let players = Object.entries(pSnap.val());
-
-    players.sort((a, b) => (b[1].bestStreak || 0) - (a[1].bestStreak || 0));
-
-    let best = players[0];
-    document.getElementById("bestStreak").innerText =
-      `${best[0]} (${best[1].bestStreak || 0} انتصار متتالي)`;
-  }
-
-  // ⚔️ أكثر مواجهة
   const hSnap = await get(ref(db, "head_to_head"));
   if (hSnap.exists()) {
     let matches = Object.entries(hSnap.val());
-
     matches.sort((a, b) => b[1].matches - a[1].matches);
-
-    let best = matches[0];
-    document.getElementById("bestMatchup").innerText =
-      `${best[0].replace("|", " ضد ").replace(/-/g, " + ")} 
-       (${best[1].matches} مباراة)`;
+    const name = matches[0][0].replace("|", " ضد ").replace(/-/g, " + ");
+    setVal("bestMatchup", name, `${matches[0][1].matches} مباراة`);
   }
-
 }
 
 loadStats();
 
-// 🔙 رجوع
 window.goBack = function() {
   window.location.href = "index.html";
 };
-
 </script>
-
 </body>
 </html>
