@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>➕ إضافة مباراة</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+  text-align: center;
+}
+
+h1 {
+  margin-top: 20px;
+}
+
+.container {
+  background: #1e293b;
+  padding: 20px;
+  margin: 20px auto;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 12px;
+}
+
+input, select {
+  width: 90%;
+  padding: 10px;
+  margin: 8px;
+  border-radius: 8px;
+  border: none;
+}
+
+button {
+  padding: 12px 20px;
+  margin-top: 10px;
+  background: #22c55e;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+}
+
+button:hover {
+  background: #16a34a;
+}
+
+.back {
+  background: #3b82f6;
+}
+
+.error {
+  color: red;
+  margin-top: 10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>🎮 إضافة مباراة 2 ضد 2</h1>
+
+<div class="container">
+
+<h3>👥 الفريق 1</h3>
+<input id="t1p1" placeholder="اسم اللاعب الأول">
+<input id="t1p2" placeholder="اسم اللاعب الثاني">
+
+<h3>👥 الفريق 2</h3>
+<input id="t2p1" placeholder="اسم اللاعب الأول">
+<input id="t2p2" placeholder="اسم اللاعب الثاني">
+
+<h3>🏆 الفائز</h3>
+<select id="winner">
+  <option value="1">الفريق 1</option>
+  <option value="2">الفريق 2</option>
+</select>
+
+<button onclick="submitMatch()">💾 تسجيل المباراة</button>
+<br>
+<button class="back" onclick="goBack()">⬅ الرجوع</button>
+
+<div class="error" id="error"></div>
+
+</div>
+
+<script type="module">
+
+// 🔥 Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, get, set, push } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC7EVNCSl48CQgIC_a8wdC5UG2tKLtNKjQ",
+  authDomain: "garag-system.firebaseapp.com",
+  databaseURL: "https://garag-system-default-rtdb.firebaseio.com",
+  projectId: "garag-system",
+  storageBucket: "garag-system.firebasestorage.app",
+  messagingSenderId: "330947022055",
+  appId: "1:330947022055:web:ce96293502f40d2645a642"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// 🧮 تحديد الدوري
+function getLeague(points) {
+  if (points >= 300) return 1;
+  if (points >= 200) return 2;
+  if (points >= 120) return 3;
+  if (points >= 60) return 4;
+  return 5;
+}
+
+// 🔄 تحديث لاعب
+async function updatePlayer(name, isWinner) {
+
+  const playerRef = ref(db, "players/" + name);
+  const snapshot = await get(playerRef);
+
+  let data = snapshot.exists() ? snapshot.val() : {
+    points: 0,
+    wins: 0,
+    losses: 0,
+    streak: 0,
+    bestStreak: 0
+  };
+
+  if (isWinner) {
+    data.points += 25;
+    data.wins += 1;
+    data.streak += 1;
+
+    if (data.streak > data.bestStreak) {
+      data.bestStreak = data.streak;
+    }
+
+  } else {
+    data.points -= 10;
+    data.losses += 1;
+    data.streak = 0;
+  }
+
+  data.league = getLeague(data.points);
+
+  await set(playerRef, data);
+}
+
+// 🎯 إنشاء مفتاح المواجهة (Head-to-Head)
+function generateKey(team1, team2) {
+
+  let t1 = [...team1].sort().join("-");
+  let t2 = [...team2].sort().join("-");
+
+  return t1 < t2 ? `${t1}|${t2}` : `${t2}|${t1}`;
+}
+
+// 🔥 تحديث المواجهات
+async function updateHeadToHead(team1, team2, winner) {
+
+  const key = generateKey(team1, team2);
+  const hRef = ref(db, "head_to_head/" + key);
+
+  const snapshot = await get(hRef);
+
+  let data = snapshot.exists() ? snapshot.val() : {
+    matches: 0,
+    team1Wins: 0,
+    team2Wins: 0
+  };
+
+  data.matches += 1;
+
+  if (winner === 1) data.team1Wins += 1;
+  else data.team2Wins += 1;
+
+  await set(hRef, data);
+}
+
+// 👥 تحديث الثنائيات (Duo)
+async function updateDuo(team, isWinner) {
+
+  let duoKey = [...team].sort().join("-");
+
+  const dRef = ref(db, "duos/" + duoKey);
+  const snapshot = await get(dRef);
+
+  let data = snapshot.exists() ? snapshot.val() : {
+    matches: 0,
+    wins: 0
+  };
+
+  data.matches += 1;
+  if (isWinner) data.wins += 1;
+
+  await set(dRef, data);
+}
+
+// 🚀 تسجيل المباراة
+window.submitMatch = async function() {
+
+  const t1p1 = document.getElementById("t1p1").value.trim();
+  const t1p2 = document.getElementById("t1p2").value.trim();
+  const t2p1 = document.getElementById("t2p1").value.trim();
+  const t2p2 = document.getElementById("t2p2").value.trim();
+
+  const winner = parseInt(document.getElementById("winner").value);
+
+  const errorDiv = document.getElementById("error");
+  errorDiv.innerText = "";
+
+  // ✅ تحقق
+  if (!t1p1 || !t1p2 || !t2p1 || !t2p2) {
+    errorDiv.innerText = "❌ يرجى ملء جميع الحقول";
+    return;
+  }
+
+  if (new Set([t1p1, t1p2, t2p1, t2p2]).size < 4) {
+    errorDiv.innerText = "❌ لا يمكن تكرار نفس اللاعب";
+    return;
+  }
+
+  const team1 = [t1p1, t1p2];
+  const team2 = [t2p1, t2p2];
+
+  // 💾 حفظ المباراة
+  await push(ref(db, "matches"), {
+    team1,
+    team2,
+    winner,
+    date: new Date().toISOString()
+  });
+
+  // 🔄 تحديث اللاعبين
+  for (let p of team1) {
+    await updatePlayer(p, winner === 1);
+  }
+
+  for (let p of team2) {
+    await updatePlayer(p, winner === 2);
+  }
+
+  // 🔥 تحديث الأنظمة
+  await updateHeadToHead(team1, team2, winner);
+  await updateDuo(team1, winner === 1);
+  await updateDuo(team2, winner === 2);
+
+  alert("✅ تم تسجيل المباراة بنجاح");
+
+  // 🔄 تفريغ الحقول
+  document.querySelectorAll("input").forEach(i => i.value = "");
+}
+
+// 🔙 رجوع
+window.goBack = function() {
+  window.location.href = "index.html";
+};
+
+</script>
+
+</body>
+</html>

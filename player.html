@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>👤 صفحة اللاعب</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+  text-align: center;
+}
+
+.container {
+  width: 90%;
+  max-width: 700px;
+  margin: auto;
+}
+
+.card {
+  background: #1e293b;
+  padding: 20px;
+  margin: 15px 0;
+  border-radius: 12px;
+}
+
+h1 {
+  margin-top: 20px;
+}
+
+.stat {
+  margin: 10px;
+}
+
+.win { color: #22c55e; }
+.loss { color: #ef4444; }
+
+button {
+  padding: 10px 20px;
+  background: #3b82f6;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+}
+
+table {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+}
+
+td, th {
+  border-bottom: 1px solid #334155;
+  padding: 8px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>👤 صفحة اللاعب</h1>
+
+<div class="container">
+
+<div class="card" id="info"></div>
+
+<div class="card">
+<h3>📊 الإحصائيات</h3>
+<div id="stats"></div>
+</div>
+
+<div class="card">
+<h3>👥 أفضل شريك</h3>
+<div id="duo"></div>
+</div>
+
+<div class="card">
+<h3>🔥 آخر المباريات</h3>
+<table>
+<thead>
+<tr>
+<th>الفريق</th>
+<th>ضد</th>
+<th>النتيجة</th>
+</tr>
+</thead>
+<tbody id="matches"></tbody>
+</table>
+</div>
+
+<button onclick="goBack()">⬅ الرجوع</button>
+
+</div>
+
+<script type="module">
+
+// 🔥 Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC7EVNCSl48CQgIC_a8wdC5UG2tKLtNKjQ",
+  authDomain: "garag-system.firebaseapp.com",
+  databaseURL: "https://garag-system-default-rtdb.firebaseio.com",
+  projectId: "garag-system",
+  storageBucket: "garag-system.firebasestorage.app",
+  messagingSenderId: "330947022055",
+  appId: "1:330947022055:web:ce96293502f40d2645a642"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// 📥 جلب اسم اللاعب من الرابط
+const params = new URLSearchParams(window.location.search);
+const playerName = params.get("name");
+
+// 🧮 تحديد الدوري
+function getLeagueName(league) {
+  return "الدوري " + league;
+}
+
+// 🚀 تحميل البيانات
+async function loadPlayer() {
+
+  // 📊 بيانات اللاعب
+  const snapshot = await get(ref(db, "players/" + playerName));
+  if (!snapshot.exists()) {
+    document.body.innerHTML = "❌ اللاعب غير موجود";
+    return;
+  }
+
+  const p = snapshot.val();
+
+  document.getElementById("info").innerHTML = `
+    <h2>${playerName}</h2>
+    <div class="stat">🏆 النقاط: ${p.points}</div>
+    <div class="stat">📊 ${getLeagueName(p.league)}</div>
+  `;
+
+  // 📈 إحصائيات
+  let total = (p.wins || 0) + (p.losses || 0);
+  let winRate = total ? Math.round((p.wins / total) * 100) : 0;
+
+  document.getElementById("stats").innerHTML = `
+    <div class="win">فوز: ${p.wins || 0}</div>
+    <div class="loss">خسارة: ${p.losses || 0}</div>
+    <div>🔥 streak: ${p.streak || 0}</div>
+    <div>⭐ أعلى streak: ${p.bestStreak || 0}</div>
+    <div>📊 win rate: ${winRate}%</div>
+  `;
+
+  // 👥 أفضل شريك
+  const duoSnap = await get(ref(db, "duos"));
+  let bestPartner = "لا يوجد";
+  let bestWins = 0;
+
+  if (duoSnap.exists()) {
+    let duos = duoSnap.val();
+
+    for (let key in duos) {
+      let players = key.split("-");
+      if (players.includes(playerName)) {
+        if (duos[key].wins > bestWins) {
+          bestWins = duos[key].wins;
+          bestPartner = players.find(p => p !== playerName);
+        }
+      }
+    }
+  }
+
+  document.getElementById("duo").innerHTML = `
+    🤝 ${bestPartner} (${bestWins} فوز)
+  `;
+
+  // 🎮 آخر المباريات
+  const matchSnap = await get(ref(db, "matches"));
+  let html = "";
+
+  if (matchSnap.exists()) {
+    let matches = Object.values(matchSnap.val()).reverse();
+
+    for (let m of matches) {
+
+      if (m.team1.includes(playerName) || m.team2.includes(playerName)) {
+
+        let isTeam1 = m.team1.includes(playerName);
+        let team = isTeam1 ? m.team1 : m.team2;
+        let opponent = isTeam1 ? m.team2 : m.team1;
+
+        let win = (isTeam1 && m.winner === 1) || (!isTeam1 && m.winner === 2);
+
+        html += `
+        <tr>
+          <td>${team.join(" + ")}</td>
+          <td>${opponent.join(" + ")}</td>
+          <td class="${win ? 'win' : 'loss'}">
+            ${win ? "فوز" : "خسارة"}
+          </td>
+        </tr>`;
+      }
+    }
+  }
+
+  document.getElementById("matches").innerHTML = html;
+}
+
+loadPlayer();
+
+// 🔙 رجوع
+window.goBack = function() {
+  window.location.href = "index.html";
+};
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>📊 الإحصائيات</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+  text-align: center;
+}
+
+.container {
+  width: 90%;
+  max-width: 700px;
+  margin: auto;
+}
+
+.card {
+  background: #1e293b;
+  padding: 20px;
+  margin: 15px 0;
+  border-radius: 12px;
+}
+
+h1 {
+  margin-top: 20px;
+}
+
+.highlight {
+  font-size: 20px;
+  color: #22c55e;
+  font-weight: bold;
+}
+
+button {
+  padding: 10px 20px;
+  background: #3b82f6;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>📊 الإحصائيات العامة</h1>
+
+<div class="container">
+
+<div class="card">
+<h3>🥇 أفضل لاعب</h3>
+<div id="bestPlayer" class="highlight"></div>
+</div>
+
+<div class="card">
+<h3>👥 أفضل ثنائي</h3>
+<div id="bestDuo" class="highlight"></div>
+</div>
+
+<div class="card">
+<h3>🔥 أعلى سلسلة انتصارات</h3>
+<div id="bestStreak" class="highlight"></div>
+</div>
+
+<div class="card">
+<h3>⚔️ أكثر مواجهة</h3>
+<div id="bestMatchup" class="highlight"></div>
+</div>
+
+<button onclick="goBack()">⬅ الرجوع</button>
+
+</div>
+
+<script type="module">
+
+// 🔥 Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC7EVNCSl48CQgIC_a8wdC5UG2tKLtNKjQ",
+  authDomain: "garag-system.firebaseapp.com",
+  databaseURL: "https://garag-system-default-rtdb.firebaseio.com",
+  projectId: "garag-system",
+  storageBucket: "garag-system.firebasestorage.app",
+  messagingSenderId: "330947022055",
+  appId: "1:330947022055:web:ce96293502f40d2645a642"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// 🚀 تحميل الإحصائيات
+async function loadStats() {
+
+  // 🥇 أفضل لاعب
+  const pSnap = await get(ref(db, "players"));
+  if (pSnap.exists()) {
+    let players = Object.entries(pSnap.val());
+
+    players.sort((a, b) => b[1].points - a[1].points);
+
+    let best = players[0];
+    document.getElementById("bestPlayer").innerText =
+      `${best[0]} (${best[1].points} نقطة)`;
+  }
+
+  // 👥 أفضل ثنائي
+  const dSnap = await get(ref(db, "duos"));
+  if (dSnap.exists()) {
+    let duos = Object.entries(dSnap.val());
+
+    duos.sort((a, b) => b[1].wins - a[1].wins);
+
+    let best = duos[0];
+    document.getElementById("bestDuo").innerText =
+      `${best[0].replace("-", " + ")} (${best[1].wins} فوز)`;
+  }
+
+  // 🔥 أعلى streak
+  if (pSnap.exists()) {
+    let players = Object.entries(pSnap.val());
+
+    players.sort((a, b) => (b[1].bestStreak || 0) - (a[1].bestStreak || 0));
+
+    let best = players[0];
+    document.getElementById("bestStreak").innerText =
+      `${best[0]} (${best[1].bestStreak || 0} انتصار متتالي)`;
+  }
+
+  // ⚔️ أكثر مواجهة
+  const hSnap = await get(ref(db, "head_to_head"));
+  if (hSnap.exists()) {
+    let matches = Object.entries(hSnap.val());
+
+    matches.sort((a, b) => b[1].matches - a[1].matches);
+
+    let best = matches[0];
+    document.getElementById("bestMatchup").innerText =
+      `${best[0].replace("|", " ضد ").replace(/-/g, " + ")} 
+       (${best[1].matches} مباراة)`;
+  }
+
+}
+
+loadStats();
+
+// 🔙 رجوع
+window.goBack = function() {
+  window.location.href = "index.html";
+};
+
+</script>
+
+</body>
+</html>

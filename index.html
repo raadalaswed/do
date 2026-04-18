@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>🏆 دوري الدومينو</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+  text-align: center;
+}
+
+h1 {
+  margin-top: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  margin: 8px;
+  background: #22c55e;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+}
+
+button:hover {
+  background: #16a34a;
+}
+
+table {
+  margin: 20px auto;
+  border-collapse: collapse;
+  width: 90%;
+  background: #1e293b;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #334155;
+}
+
+th {
+  background: #020617;
+}
+
+.win { color: #22c55e; }
+.loss { color: #ef4444; }
+
+.top {
+  background: #065f46;
+}
+
+.bottom {
+  background: #7f1d1d;
+}
+
+.streak {
+  color: orange;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>🏆 دوري الدومينو</h1>
+
+<!-- 🎮 الأزرار -->
+<button onclick="goToAddMatch()">➕ إضافة مباراة</button>
+<button onclick="goToStats()">📊 الإحصائيات</button>
+
+<h2>📊 جدول الترتيب</h2>
+
+<table>
+<thead>
+<tr>
+<th>الترتيب</th>
+<th>اللاعب</th>
+<th>النقاط</th>
+<th>الدوري</th>
+<th>عدد الفوز</th>
+<th>عدد الخسارة</th>
+<th>🔥 سلسلة الانتصارات</th>
+</tr>
+</thead>
+<tbody id="table"></tbody>
+</table>
+
+<script type="module">
+
+// 🔥 Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC7EVNCSl48CQgIC_a8wdC5UG2tKLtNKjQ",
+  authDomain: "garag-system.firebaseapp.com",
+  databaseURL: "https://garag-system-default-rtdb.firebaseio.com",
+  projectId: "garag-system",
+  storageBucket: "garag-system.firebasestorage.app",
+  messagingSenderId: "330947022055",
+  appId: "1:330947022055:web:ce96293502f40d2645a642"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// 🧮 تحديد الدوري
+function getLeague(points) {
+  if (points >= 300) return 1;
+  if (points >= 200) return 2;
+  if (points >= 120) return 3;
+  if (points >= 60) return 4;
+  return 5;
+}
+
+// 📅 فحص نهاية الموسم (كل جمعة)
+async function checkSeasonEnd() {
+  const today = new Date();
+
+  if (today.getDay() === 5) {
+
+    const snapshot = await get(ref(db, "players"));
+    if (!snapshot.exists()) return;
+
+    let players = snapshot.val();
+
+    let list = Object.entries(players).map(([name, data]) => ({
+      name,
+      ...data
+    }));
+
+    list.sort((a, b) => b.points - a.points);
+
+    if (list.length >= 4) {
+      list[0].points += 20;
+      list[1].points += 10;
+
+      list[list.length - 1].points -= 20;
+      list[list.length - 2].points -= 10;
+    }
+
+    for (let p of list) {
+      p.league = getLeague(p.points);
+      await set(ref(db, "players/" + p.name), p);
+    }
+  }
+}
+
+// 📊 تحميل اللاعبين
+async function loadPlayers() {
+
+  await checkSeasonEnd();
+
+  const snapshot = await get(ref(db, "players"));
+
+  if (!snapshot.exists()) {
+    document.getElementById("table").innerHTML =
+      "<tr><td colspan='7'>لا يوجد لاعبين</td></tr>";
+    return;
+  }
+
+  let players = snapshot.val();
+
+  let list = Object.entries(players).map(([name, data]) => ({
+    name,
+    ...data
+  }));
+
+  list.sort((a, b) => b.points - a.points);
+
+  let html = "";
+
+  list.forEach((p, index) => {
+
+    let rowClass = "";
+    if (index < 2) rowClass = "top";
+    if (index >= list.length - 2) rowClass = "bottom";
+
+    html += `
+    <tr class="${rowClass}">
+      <td>${index + 1}</td>
+      <td>
+        <a href="player.html?name=${p.name}">
+          ${p.name}
+        </a>
+      </td>
+      <td>${p.points}</td>
+      <td>الدوري ${p.league}</td>
+      <td class="win">${p.wins || 0}</td>
+      <td class="loss">${p.losses || 0}</td>
+      <td class="streak">🔥 ${p.streak || 0}</td>
+    </tr>`;
+  });
+
+  document.getElementById("table").innerHTML = html;
+}
+
+// تشغيل
+loadPlayers();
+
+</script>
+
+<script>
+// 🔀 الانتقال إلى إضافة مباراة
+function goToAddMatch() {
+  window.location.href = "add-match.html";
+}
+
+// 📊 الانتقال إلى الإحصائيات
+function goToStats() {
+  window.location.href = "stats.html";
+}
+</script>
+
+</body>
+</html>
