@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>🧑‍💻 لوحة الإدارة</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+  text-align: center;
+}
+
+.container {
+  width: 90%;
+  max-width: 800px;
+  margin: auto;
+}
+
+.card {
+  background: #1e293b;
+  padding: 20px;
+  margin: 15px 0;
+  border-radius: 12px;
+}
+
+input {
+  padding: 10px;
+  margin: 5px;
+  width: 70%;
+  border-radius: 8px;
+  border: none;
+}
+
+button {
+  padding: 10px 15px;
+  margin: 5px;
+  background: #22c55e;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+}
+
+button.delete {
+  background: #ef4444;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  border-bottom: 1px solid #334155;
+  padding: 8px;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>🧑‍💻 لوحة الإدارة</h1>
+
+<div class="container">
+
+<!-- ➕ إضافة لاعب -->
+<div class="card">
+<h3>➕ إضافة لاعب</h3>
+<input id="newName" placeholder="اسم اللاعب">
+<button onclick="addPlayer()">إضافة</button>
+</div>
+
+<!-- 📊 تعديل / حذف لاعبين -->
+<div class="card">
+<h3>📊 إدارة اللاعبين</h3>
+<table>
+<thead>
+<tr>
+<th>الاسم</th>
+<th>النقاط</th>
+<th>تعديل</th>
+<th>حذف</th>
+</tr>
+</thead>
+<tbody id="playersTable"></tbody>
+</table>
+</div>
+
+<!-- 🎮 المباريات -->
+<div class="card">
+<h3>🎮 إدارة المباريات</h3>
+<table>
+<thead>
+<tr>
+<th>الفريق 1</th>
+<th>الفريق 2</th>
+<th>الفائز</th>
+<th>حذف</th>
+</tr>
+</thead>
+<tbody id="matchesTable"></tbody>
+</table>
+</div>
+
+</div>
+
+<script type="module">
+
+// 🔥 Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, get, set, remove, update, push } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC7EVNCSl48CQgIC_a8wdC5UG2tKLtNKjQ",
+  authDomain: "garag-system.firebaseapp.com",
+  databaseURL: "https://garag-system-default-rtdb.firebaseio.com",
+  projectId: "garag-system",
+  storageBucket: "garag-system.firebasestorage.app",
+  messagingSenderId: "330947022055",
+  appId: "1:330947022055:web:ce96293502f40d2645a642"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+//
+// 🧠 PLAYERS
+//
+
+async function loadPlayers() {
+  const snapshot = await get(ref(db, "players"));
+  if (!snapshot.exists()) return;
+
+  let data = snapshot.val();
+  let html = "";
+
+  for (let name in data) {
+    let p = data[name];
+
+    html += `
+    <tr>
+      <td>${name}</td>
+      <td>
+        <input id="p_${name}" value="${p.points}">
+      </td>
+      <td>
+        <button onclick="updatePlayer('${name}')">تحديث</button>
+      </td>
+      <td>
+        <button class="delete" onclick="deletePlayer('${name}')">حذف</button>
+      </td>
+    </tr>`;
+  }
+
+  document.getElementById("playersTable").innerHTML = html;
+}
+
+window.addPlayer = async function() {
+  let name = document.getElementById("newName").value.trim();
+  if (!name) return alert("ادخل اسم اللاعب");
+
+  await set(ref(db, "players/" + name), {
+    name,
+    points: 0,
+    wins: 0,
+    losses: 0,
+    streak: 0,
+    bestStreak: 0,
+    league: 5
+  });
+
+  loadPlayers();
+}
+
+window.updatePlayer = async function(name) {
+  let points = document.getElementById("p_" + name).value;
+
+  await update(ref(db, "players/" + name), {
+    points: Number(points)
+  });
+
+  alert("تم التحديث");
+  loadPlayers();
+}
+
+window.deletePlayer = async function(name) {
+  await remove(ref(db, "players/" + name));
+  loadPlayers();
+}
+
+//
+// 🎮 MATCHES
+//
+
+async function loadMatches() {
+  const snapshot = await get(ref(db, "matches"));
+  if (!snapshot.exists()) return;
+
+  let data = snapshot.val();
+  let html = "";
+
+  for (let key in data) {
+    let m = data[key];
+
+    html += `
+    <tr>
+      <td>${m.team1.join(" + ")}</td>
+      <td>${m.team2.join(" + ")}</td>
+      <td>${m.winner}</td>
+      <td>
+        <button class="delete" onclick="deleteMatch('${key}')">حذف</button>
+      </td>
+    </tr>`;
+  }
+
+  document.getElementById("matchesTable").innerHTML = html;
+}
+
+window.deleteMatch = async function(id) {
+  await remove(ref(db, "matches/" + id));
+  loadMatches();
+}
+
+//
+// 🚀 تشغيل
+//
+loadPlayers();
+loadMatches();
+
+</script>
+
+</body>
+</html>
