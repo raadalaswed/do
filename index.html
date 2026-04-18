@@ -2,6 +2,10 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+
+<!-- 📱 مهم للموبايل -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>🏆 دوري الدومينو</title>
 
 <style>
@@ -25,28 +29,25 @@ button {
   color: white;
 }
 
-.add {
-  background: #22c55e;
-}
-
+.add { background: #22c55e; }
 .add:hover { background: #16a34a; }
 
-.stats {
-  background: #3b82f6;
-}
-
+.stats { background: #3b82f6; }
 .stats:hover { background: #2563eb; }
 
-.admin {
-  background: #f59e0b;
-}
-
+.admin { background: #f59e0b; }
 .admin:hover { background: #d97706; }
+
+/* 📱 تحسين الجدول */
+.table-container {
+  overflow-x: auto;
+}
 
 table {
   margin: 20px auto;
   border-collapse: collapse;
   width: 90%;
+  min-width: 600px;
   background: #1e293b;
   border-radius: 10px;
   overflow: hidden;
@@ -78,6 +79,33 @@ a {
 a:hover {
   text-decoration: underline;
 }
+
+/* 🏆 صندوق الدوريات */
+.leagues {
+  width: 90%;
+  margin: auto;
+}
+
+.league-box {
+  background: #1e293b;
+  margin: 5px 0;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* 📱 تحسين الموبايل */
+@media (max-width: 600px) {
+  button {
+    width: 90%;
+    font-size: 14px;
+  }
+
+  th, td {
+    font-size: 12px;
+    padding: 8px;
+  }
+}
 </style>
 
 </head>
@@ -91,8 +119,19 @@ a:hover {
 <button class="stats" onclick="goToStats()">📊 الإحصائيات</button>
 <button class="admin" onclick="goToAdmin()">🧑‍💻 لوحة الإدارة</button>
 
+<!-- 🏆 جديد: توضيح الدوريات -->
+<div class="leagues">
+  <div class="league-box">🥇 الدوري 1: 300+ نقطة</div>
+  <div class="league-box">🥈 الدوري 2: 200 - 299</div>
+  <div class="league-box">🥉 الدوري 3: 120 - 199</div>
+  <div class="league-box">4️⃣ الدوري 4: 60 - 119</div>
+  <div class="league-box">5️⃣ الدوري 5: أقل من 60</div>
+</div>
+
 <h2>📊 جدول الترتيب</h2>
 
+<!-- 📱 لف الجدول -->
+<div class="table-container">
 <table>
 <thead>
 <tr>
@@ -107,6 +146,7 @@ a:hover {
 </thead>
 <tbody id="table"></tbody>
 </table>
+</div>
 
 <script type="module">
 
@@ -169,7 +209,7 @@ async function checkSeasonEnd() {
   }
 }
 
-// 📊 تحميل اللاعبين (Real-time شبه تحديث)
+// 📊 تحميل اللاعبين
 async function loadPlayers() {
 
   await checkSeasonEnd();
@@ -218,17 +258,13 @@ async function loadPlayers() {
   document.getElementById("table").innerHTML = html;
 }
 
-// 🚀 تشغيل أول مرة
 loadPlayers();
-
-// 🔄 تحديث تلقائي كل 5 ثواني (مهم)
 setInterval(loadPlayers, 5000);
 
 </script>
 
 <script>
 
-// 🔀 التنقل
 function goToAddMatch() {
   window.location.href = "add-match.html";
 }
