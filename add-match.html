@@ -2,94 +2,328 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>➕ إضافة مباراة</title>
-
 <style>
-body {
-  font-family: Arial;
-  background: #0f172a;
-  color: white;
-  text-align: center;
-}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-h1 {
-  margin-top: 20px;
-}
+  body {
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+    min-height: 100vh;
+  }
 
-.container {
-  background: #1e293b;
-  padding: 20px;
-  margin: 20px auto;
-  width: 90%;
-  max-width: 500px;
-  border-radius: 12px;
-}
+  /* ── الهيدر ── */
+  .header {
+    background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+    border-bottom: 1px solid #1e293b;
+    padding: 1.8rem 1rem 1.4rem;
+    text-align: center;
+  }
 
-input, select {
-  width: 90%;
-  padding: 10px;
-  margin: 8px;
-  border-radius: 8px;
-  border: none;
-}
+  .header-title {
+    font-size: clamp(20px, 5vw, 26px);
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 4px;
+  }
 
-button {
-  padding: 12px 20px;
-  margin-top: 10px;
-  background: #22c55e;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  color: white;
-}
+  .header-sub { font-size: 13px; color: #475569; }
 
-button:hover {
-  background: #16a34a;
-}
+  /* ── الصفحة ── */
+  .page {
+    max-width: 500px;
+    margin: auto;
+    padding: 1.4rem 1rem 3rem;
+  }
 
-.back {
-  background: #3b82f6;
-}
+  /* ── بطاقة الفريق ── */
+  .team-card {
+    border-radius: 16px;
+    padding: 1.2rem;
+    margin-bottom: 12px;
+    border: 1px solid;
+  }
 
-.error {
-  color: red;
-  margin-top: 10px;
-}
+  .team-card.t1 {
+    background: rgba(99,102,241,0.07);
+    border-color: rgba(99,102,241,0.25);
+  }
+
+  .team-card.t2 {
+    background: rgba(239,68,68,0.07);
+    border-color: rgba(239,68,68,0.2);
+  }
+
+  .team-label {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .team-card.t1 .team-label { color: #a5b4fc; }
+  .team-card.t2 .team-label { color: #fca5a5; }
+
+  .team-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .t1 .team-dot { background: #6366f1; }
+  .t2 .team-dot { background: #ef4444; }
+
+  /* ── حقول الإدخال ── */
+  .input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 0 12px;
+    margin-bottom: 8px;
+    transition: border-color 0.2s;
+  }
+
+  .input-row:focus-within { border-color: #6366f1; }
+  .team-card.t2 .input-row:focus-within { border-color: #ef4444; }
+
+  .input-icon { font-size: 15px; flex-shrink: 0; }
+
+  .input-row input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 14px;
+    padding: 12px 0;
+    font-family: Arial, sans-serif;
+  }
+
+  .input-row input::placeholder { color: #475569; }
+
+  /* ── بطاقة الفائز ── */
+  .winner-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 16px;
+    padding: 1.2rem;
+    margin-bottom: 14px;
+  }
+
+  .winner-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fbbf24;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .winner-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .winner-opt {
+    padding: 12px;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.15s;
+    background: #0f172a;
+    color: #94a3b8;
+  }
+
+  .winner-opt:hover { border-color: #334155; color: #f1f5f9; }
+
+  .winner-opt.selected-t1 {
+    background: rgba(99,102,241,0.15);
+    border-color: #6366f1;
+    color: #a5b4fc;
+  }
+
+  .winner-opt.selected-t2 {
+    background: rgba(239,68,68,0.15);
+    border-color: #ef4444;
+    color: #fca5a5;
+  }
+
+  /* ── الأزرار ── */
+  .btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #16a34a, #15803d);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: opacity 0.2s, transform 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-submit:hover   { opacity: 0.9; }
+  .btn-submit:active  { transform: scale(0.98); }
+  .btn-submit:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-back {
+    width: 100%;
+    padding: 13px;
+    background: transparent;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    color: #cbd5e1;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-back:hover  { background: #1e293b; border-color: #475569; }
+  .btn-back:active { transform: scale(0.98); }
+
+  /* ── رسائل الحالة ── */
+  .msg {
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .msg.error   { background: rgba(239,68,68,0.12);  border: 1px solid rgba(239,68,68,0.3);  color: #fca5a5; display: flex; }
+  .msg.success { background: rgba(34,197,94,0.12);  border: 1px solid rgba(34,197,94,0.3);  color: #86efac; display: flex; }
+  .msg.loading { background: rgba(59,130,246,0.1);  border: 1px solid rgba(59,130,246,0.25); color: #93c5fd; display: flex; }
+
+  /* ── فاصل ── */
+  .vs-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 4px 0 12px;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .vs-divider::before,
+  .vs-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #1e293b;
+  }
+
+  .vs-badge {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 20px;
+    padding: 4px 14px;
+    color: #64748b;
+    font-size: 12px;
+  }
 </style>
-
 </head>
-
 <body>
 
-<h1>🎮 إضافة مباراة 2 ضد 2</h1>
+<!-- الهيدر -->
+<div class="header">
+  <div class="header-title">🎮 إضافة مباراة</div>
+  <div class="header-sub">2 ضد 2 — دوري الدومينو</div>
+</div>
 
-<div class="container">
+<div class="page">
 
-<h3>👥 الفريق 1</h3>
-<input id="t1p1" placeholder="اسم اللاعب الأول">
-<input id="t1p2" placeholder="اسم اللاعب الثاني">
+  <!-- رسائل الحالة -->
+  <div class="msg" id="msg"></div>
 
-<h3>👥 الفريق 2</h3>
-<input id="t2p1" placeholder="اسم اللاعب الأول">
-<input id="t2p2" placeholder="اسم اللاعب الثاني">
+  <!-- الفريق 1 -->
+  <div class="team-card t1">
+    <div class="team-label">
+      <span class="team-dot"></span> الفريق الأول
+    </div>
+    <div class="input-row">
+      <span class="input-icon">👤</span>
+      <input id="t1p1" placeholder="اسم اللاعب الأول" autocomplete="off">
+    </div>
+    <div class="input-row">
+      <span class="input-icon">👤</span>
+      <input id="t1p2" placeholder="اسم اللاعب الثاني" autocomplete="off">
+    </div>
+  </div>
 
-<h3>🏆 الفائز</h3>
-<select id="winner">
-  <option value="1">الفريق 1</option>
-  <option value="2">الفريق 2</option>
-</select>
+  <!-- فاصل VS -->
+  <div class="vs-divider"><span class="vs-badge">⚔️ ضد</span></div>
 
-<button onclick="submitMatch()">💾 تسجيل المباراة</button>
-<br>
-<button class="back" onclick="goBack()">⬅ الرجوع</button>
+  <!-- الفريق 2 -->
+  <div class="team-card t2">
+    <div class="team-label">
+      <span class="team-dot"></span> الفريق الثاني
+    </div>
+    <div class="input-row">
+      <span class="input-icon">👤</span>
+      <input id="t2p1" placeholder="اسم اللاعب الأول" autocomplete="off">
+    </div>
+    <div class="input-row">
+      <span class="input-icon">👤</span>
+      <input id="t2p2" placeholder="اسم اللاعب الثاني" autocomplete="off">
+    </div>
+  </div>
 
-<div class="error" id="error"></div>
+  <!-- الفائز -->
+  <div class="winner-card">
+    <div class="winner-label">🏆 من فاز بالمباراة؟</div>
+    <div class="winner-options">
+      <div class="winner-opt selected-t1" id="opt1" onclick="selectWinner(1)">
+        🟣 الفريق الأول
+      </div>
+      <div class="winner-opt" id="opt2" onclick="selectWinner(2)">
+        🔴 الفريق الثاني
+      </div>
+    </div>
+    <!-- حقل مخفي للقيمة -->
+    <select id="winner" style="display:none">
+      <option value="1">الفريق 1</option>
+      <option value="2">الفريق 2</option>
+    </select>
+  </div>
+
+  <!-- الأزرار -->
+  <button class="btn-submit" id="submitBtn" onclick="submitMatch()">
+    💾 تسجيل المباراة
+  </button>
+  <button class="btn-back" onclick="goBack()">⬅ الرجوع</button>
 
 </div>
 
 <script type="module">
-
-// 🔥 Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getDatabase, ref, get, set, push } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
@@ -106,160 +340,125 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// 🧮 تحديد الدوري
+// اختيار الفائز بصرياً
+window.selectWinner = function(val) {
+  document.getElementById("winner").value = val;
+  document.getElementById("opt1").className = "winner-opt" + (val === 1 ? " selected-t1" : "");
+  document.getElementById("opt2").className = "winner-opt" + (val === 2 ? " selected-t2" : "");
+};
+
+function showMsg(type, text) {
+  const el = document.getElementById("msg");
+  el.className = "msg " + type;
+  el.innerHTML = text;
+}
+
+function hideMsg() {
+  document.getElementById("msg").className = "msg";
+}
+
 function getLeague(points) {
   if (points >= 300) return 1;
   if (points >= 200) return 2;
   if (points >= 120) return 3;
-  if (points >= 60) return 4;
+  if (points >= 60)  return 4;
   return 5;
 }
 
-// 🔄 تحديث لاعب
 async function updatePlayer(name, isWinner) {
-
   const playerRef = ref(db, "players/" + name);
   const snapshot = await get(playerRef);
-
   let data = snapshot.exists() ? snapshot.val() : {
-    points: 0,
-    wins: 0,
-    losses: 0,
-    streak: 0,
-    bestStreak: 0
+    points: 0, wins: 0, losses: 0, streak: 0, bestStreak: 0
   };
-
   if (isWinner) {
     data.points += 25;
     data.wins += 1;
     data.streak += 1;
-
-    if (data.streak > data.bestStreak) {
-      data.bestStreak = data.streak;
-    }
-
+    if (data.streak > data.bestStreak) data.bestStreak = data.streak;
   } else {
     data.points -= 10;
     data.losses += 1;
     data.streak = 0;
   }
-
   data.league = getLeague(data.points);
-
   await set(playerRef, data);
 }
 
-// 🎯 إنشاء مفتاح المواجهة (Head-to-Head)
 function generateKey(team1, team2) {
-
   let t1 = [...team1].sort().join("-");
   let t2 = [...team2].sort().join("-");
-
   return t1 < t2 ? `${t1}|${t2}` : `${t2}|${t1}`;
 }
 
-// 🔥 تحديث المواجهات
 async function updateHeadToHead(team1, team2, winner) {
-
   const key = generateKey(team1, team2);
   const hRef = ref(db, "head_to_head/" + key);
-
   const snapshot = await get(hRef);
-
-  let data = snapshot.exists() ? snapshot.val() : {
-    matches: 0,
-    team1Wins: 0,
-    team2Wins: 0
-  };
-
+  let data = snapshot.exists() ? snapshot.val() : { matches: 0, team1Wins: 0, team2Wins: 0 };
   data.matches += 1;
-
   if (winner === 1) data.team1Wins += 1;
   else data.team2Wins += 1;
-
   await set(hRef, data);
 }
 
-// 👥 تحديث الثنائيات (Duo)
 async function updateDuo(team, isWinner) {
-
   let duoKey = [...team].sort().join("-");
-
   const dRef = ref(db, "duos/" + duoKey);
   const snapshot = await get(dRef);
-
-  let data = snapshot.exists() ? snapshot.val() : {
-    matches: 0,
-    wins: 0
-  };
-
+  let data = snapshot.exists() ? snapshot.val() : { matches: 0, wins: 0 };
   data.matches += 1;
   if (isWinner) data.wins += 1;
-
   await set(dRef, data);
 }
 
-// 🚀 تسجيل المباراة
 window.submitMatch = async function() {
-
   const t1p1 = document.getElementById("t1p1").value.trim();
   const t1p2 = document.getElementById("t1p2").value.trim();
   const t2p1 = document.getElementById("t2p1").value.trim();
   const t2p2 = document.getElementById("t2p2").value.trim();
-
   const winner = parseInt(document.getElementById("winner").value);
 
-  const errorDiv = document.getElementById("error");
-  errorDiv.innerText = "";
+  hideMsg();
 
-  // ✅ تحقق
   if (!t1p1 || !t1p2 || !t2p1 || !t2p2) {
-    errorDiv.innerText = "❌ يرجى ملء جميع الحقول";
+    showMsg("error", "❌ يرجى ملء جميع الحقول");
     return;
   }
 
   if (new Set([t1p1, t1p2, t2p1, t2p2]).size < 4) {
-    errorDiv.innerText = "❌ لا يمكن تكرار نفس اللاعب";
+    showMsg("error", "❌ لا يمكن تكرار نفس اللاعب");
     return;
   }
 
   const team1 = [t1p1, t1p2];
   const team2 = [t2p1, t2p2];
 
-  // 💾 حفظ المباراة
-  await push(ref(db, "matches"), {
-    team1,
-    team2,
-    winner,
-    date: new Date().toISOString()
-  });
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = true;
+  showMsg("loading", "⏳ جاري تسجيل المباراة...");
 
-  // 🔄 تحديث اللاعبين
-  for (let p of team1) {
-    await updatePlayer(p, winner === 1);
+  try {
+    await push(ref(db, "matches"), { team1, team2, winner, date: new Date().toISOString() });
+    for (let p of team1) await updatePlayer(p, winner === 1);
+    for (let p of team2) await updatePlayer(p, winner === 2);
+    await updateHeadToHead(team1, team2, winner);
+    await updateDuo(team1, winner === 1);
+    await updateDuo(team2, winner === 2);
+
+    showMsg("success", "✅ تم تسجيل المباراة بنجاح!");
+    document.querySelectorAll("input").forEach(i => i.value = "");
+    selectWinner(1);
+  } catch(e) {
+    showMsg("error", "❌ حدث خطأ أثناء الحفظ، حاول مجدداً");
   }
 
-  for (let p of team2) {
-    await updatePlayer(p, winner === 2);
-  }
+  btn.disabled = false;
+};
 
-  // 🔥 تحديث الأنظمة
-  await updateHeadToHead(team1, team2, winner);
-  await updateDuo(team1, winner === 1);
-  await updateDuo(team2, winner === 2);
-
-  alert("✅ تم تسجيل المباراة بنجاح");
-
-  // 🔄 تفريغ الحقول
-  document.querySelectorAll("input").forEach(i => i.value = "");
-}
-
-// 🔙 رجوع
 window.goBack = function() {
   window.location.href = "index.html";
 };
-
 </script>
-
 </body>
 </html>
