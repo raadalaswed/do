@@ -6,29 +6,24 @@
 <title>📊 الإحصائيات</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
     font-family: Arial, sans-serif;
     background: #0f172a;
     color: white;
     min-height: 100vh;
   }
-
   .page {
     max-width: 600px;
     margin: auto;
     padding: 1.5rem 1rem 2rem;
   }
-
   .page-title {
     font-size: clamp(18px, 5vw, 24px);
     font-weight: 600;
     text-align: center;
     margin-bottom: 1.5rem;
     color: #f1f5f9;
-    letter-spacing: 0.3px;
   }
-
   .card {
     background: #1e293b;
     border: 1px solid #334155;
@@ -40,9 +35,7 @@
     gap: 14px;
     transition: border-color 0.2s;
   }
-
   .card:hover { border-color: #475569; }
-
   .card-icon {
     width: 48px;
     height: 48px;
@@ -53,20 +46,12 @@
     font-size: 22px;
     flex-shrink: 0;
   }
-
-  .icon-gold   { background: rgba(234, 179, 8, 0.15); }
-  .icon-blue   { background: rgba(59, 130, 246, 0.15); }
-  .icon-red    { background: rgba(239, 68, 68, 0.15); }
-  .icon-purple { background: rgba(168, 85, 247, 0.15); }
-
+  .icon-gold   { background: rgba(234,179,8,0.15); }
+  .icon-blue   { background: rgba(59,130,246,0.15); }
+  .icon-red    { background: rgba(239,68,68,0.15); }
+  .icon-purple { background: rgba(168,85,247,0.15); }
   .card-body { flex: 1; min-width: 0; }
-
-  .card-label {
-    font-size: 12px;
-    color: #94a3b8;
-    margin-bottom: 4px;
-  }
-
+  .card-label { font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
   .card-value {
     font-size: clamp(14px, 4vw, 17px);
     font-weight: 600;
@@ -75,25 +60,21 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
   .card-value .score {
     color: #22c55e;
     font-size: 0.88em;
     font-weight: 400;
     margin-right: 6px;
   }
-
   .loading-dot::after {
     content: '...';
     animation: dots 1.2s steps(4, end) infinite;
   }
-
   @keyframes dots {
     0%,20%  { content: '.'; }
     40%     { content: '..'; }
     60%,100%{ content: '...'; }
   }
-
   .back-btn {
     display: flex;
     align-items: center;
@@ -110,12 +91,7 @@
     cursor: pointer;
     transition: background 0.2s, border-color 0.2s;
   }
-
-  .back-btn:hover {
-    background: #1e293b;
-    border-color: #475569;
-  }
-
+  .back-btn:hover { background: #1e293b; border-color: #475569; }
   .back-btn:active { transform: scale(0.98); }
 </style>
 </head>
@@ -147,12 +123,12 @@
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-icon icon-purple">⚔️</div>
-    <div class="card-body">
-      <div class="card-label">أكثر مواجهة</div>
-      <div class="card-value" id="bestMatchup"><span class="loading-dot"></span></div>
+  <div class="card" style="flex-direction: column; align-items: stretch; gap: 10px;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div class="card-icon icon-purple">⚔️</div>
+      <div class="card-label" style="font-size: 13px; margin: 0;">أكثر مواجهة</div>
     </div>
+    <div id="bestMatchup"><span class="loading-dot"></span></div>
   </div>
 
   <button class="back-btn" onclick="goBack()">⬅ الرجوع</button>
@@ -184,10 +160,8 @@ async function loadStats() {
   const pSnap = await get(ref(db, "players"));
   if (pSnap.exists()) {
     let players = Object.entries(pSnap.val());
-
     players.sort((a, b) => b[1].points - a[1].points);
     setVal("bestPlayer", players[0][0], `${players[0][1].points} نقطة`);
-
     players.sort((a, b) => (b[1].bestStreak || 0) - (a[1].bestStreak || 0));
     setVal("bestStreak", players[0][0], `${players[0][1].bestStreak || 0} انتصار متتالي`);
   }
@@ -203,8 +177,31 @@ async function loadStats() {
   if (hSnap.exists()) {
     let matches = Object.entries(hSnap.val());
     matches.sort((a, b) => b[1].matches - a[1].matches);
-    const name = matches[0][0].replace("|", " ضد ").replace(/-/g, " + ");
-    setVal("bestMatchup", name, `${matches[0][1].matches} مباراة`);
+    const key = matches[0][0];
+    const count = matches[0][1].matches;
+
+    const [side1, side2] = key.split("|");
+    const [p1, p2] = (side1 || "").split("-");
+    const [p3, p4] = (side2 || "").split("-");
+
+    document.getElementById("bestMatchup").innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:#0f172a;border-radius:10px;padding:10px 12px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;">
+          <div style="background:rgba(168,85,247,0.15);color:#c4b5fd;border-radius:8px;padding:5px 10px;font-size:clamp(12px,3.5vw,14px);font-weight:600;text-align:center;width:100%;">${p1 || '؟'}</div>
+          <div style="color:#94a3b8;font-size:11px;">+</div>
+          <div style="background:rgba(168,85,247,0.15);color:#c4b5fd;border-radius:8px;padding:5px 10px;font-size:clamp(12px,3.5vw,14px);font-weight:600;text-align:center;width:100%;">${p2 || '؟'}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;gap:4px;">
+          <div style="font-size:18px;">⚔️</div>
+          <div style="background:rgba(249,115,22,0.15);color:#fb923c;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600;white-space:nowrap;">${count} مباراة</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;">
+          <div style="background:rgba(59,130,246,0.15);color:#93c5fd;border-radius:8px;padding:5px 10px;font-size:clamp(12px,3.5vw,14px);font-weight:600;text-align:center;width:100%;">${p3 || '؟'}</div>
+          <div style="color:#94a3b8;font-size:11px;">+</div>
+          <div style="background:rgba(59,130,246,0.15);color:#93c5fd;border-radius:8px;padding:5px 10px;font-size:clamp(12px,3.5vw,14px);font-weight:600;text-align:center;width:100%;">${p4 || '؟'}</div>
+        </div>
+      </div>
+    `;
   }
 }
 
