@@ -18,17 +18,30 @@ h1 {
 
 button {
   padding: 10px 20px;
-  margin: 8px;
-  background: #22c55e;
+  margin: 6px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   color: white;
 }
 
-button:hover {
-  background: #16a34a;
+.add {
+  background: #22c55e;
 }
+
+.add:hover { background: #16a34a; }
+
+.stats {
+  background: #3b82f6;
+}
+
+.stats:hover { background: #2563eb; }
+
+.admin {
+  background: #f59e0b;
+}
+
+.admin:hover { background: #d97706; }
 
 table {
   margin: 20px auto;
@@ -51,17 +64,10 @@ th {
 .win { color: #22c55e; }
 .loss { color: #ef4444; }
 
-.top {
-  background: #065f46;
-}
+.top { background: #065f46; }
+.bottom { background: #7f1d1d; }
 
-.bottom {
-  background: #7f1d1d;
-}
-
-.streak {
-  color: orange;
-}
+.streak { color: orange; }
 
 a {
   color: white;
@@ -81,8 +87,9 @@ a:hover {
 <h1>🏆 دوري الدومينو</h1>
 
 <!-- 🎮 الأزرار -->
-<button onclick="goToAddMatch()">➕ إضافة مباراة</button>
-<button onclick="goToStats()">📊 الإحصائيات</button>
+<button class="add" onclick="goToAddMatch()">➕ إضافة مباراة</button>
+<button class="stats" onclick="goToStats()">📊 الإحصائيات</button>
+<button class="admin" onclick="goToAdmin()">🧑‍💻 لوحة الإدارة</button>
 
 <h2>📊 جدول الترتيب</h2>
 
@@ -93,9 +100,9 @@ a:hover {
 <th>اللاعب</th>
 <th>النقاط</th>
 <th>الدوري</th>
-<th>عدد الفوز</th>
-<th>عدد الخسارة</th>
-<th>🔥 سلسلة الانتصارات</th>
+<th>فوز</th>
+<th>خسارة</th>
+<th>🔥 streak</th>
 </tr>
 </thead>
 <tbody id="table"></tbody>
@@ -129,7 +136,7 @@ function getLeague(points) {
   return 5;
 }
 
-// 📅 فحص نهاية الموسم (كل جمعة)
+// 📅 نهاية الموسم (كل جمعة)
 async function checkSeasonEnd() {
   const today = new Date();
 
@@ -162,7 +169,7 @@ async function checkSeasonEnd() {
   }
 }
 
-// 📊 تحميل اللاعبين
+// 📊 تحميل اللاعبين (Real-time شبه تحديث)
 async function loadPlayers() {
 
   await checkSeasonEnd();
@@ -189,7 +196,7 @@ async function loadPlayers() {
   list.forEach((p, index) => {
 
     let rowClass = "";
-    if (index < 2) rowClass = "top";
+    if (index === 0) rowClass = "top";
     if (index >= list.length - 2) rowClass = "bottom";
 
     html += `
@@ -211,21 +218,29 @@ async function loadPlayers() {
   document.getElementById("table").innerHTML = html;
 }
 
-// تشغيل
+// 🚀 تشغيل أول مرة
 loadPlayers();
+
+// 🔄 تحديث تلقائي كل 5 ثواني (مهم)
+setInterval(loadPlayers, 5000);
 
 </script>
 
 <script>
-// 🔀 الانتقال إلى إضافة مباراة
+
+// 🔀 التنقل
 function goToAddMatch() {
   window.location.href = "add-match.html";
 }
 
-// 📊 الانتقال إلى الإحصائيات
 function goToStats() {
   window.location.href = "stats.html";
 }
+
+function goToAdmin() {
+  window.location.href = "admin.html";
+}
+
 </script>
 
 </body>
