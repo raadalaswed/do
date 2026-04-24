@@ -92,10 +92,7 @@
     white-space: nowrap;
   }
 
-  .tab.active {
-    color: var(--purple);
-    border-bottom-color: var(--purple);
-  }
+  .tab.active { color: var(--purple); border-bottom-color: var(--purple); }
 
   /* ── Page ── */
   .page {
@@ -157,11 +154,18 @@
 
   .form-input:focus { border-color: var(--purple); }
 
-  /* ── Player Checkboxes ── */
+  /* ════════════════════════════════════════
+     ✅ FIXED: Player Selection System
+     - No CSS.escape, no getElementById by name
+     - Uses data-index attribute for reliable lookup
+     - Click handled via event delegation on container
+  ════════════════════════════════════════ */
   .players-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 8px;
+    /* container receives click events */
+    cursor: pointer;
   }
 
   .player-check {
@@ -169,49 +173,65 @@
     align-items: center;
     gap: 8px;
     background: var(--surface);
-    border: 1px solid var(--border);
+    border: 2px solid var(--border);
     border-radius: 10px;
-    padding: 9px 12px;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
+    padding: 10px 12px;
+    transition: border-color 0.2s, background 0.2s, transform 0.1s;
     user-select: none;
+    /* pointer-events on child — let parent grid handle clicks */
+    pointer-events: none;
   }
 
-  .player-check input[type=checkbox] { display: none; }
+  /* The .player-check itself gets pointer-events: none so the click 
+     always lands on the grid container and bubbles correctly.
+     We re-enable it here so :hover still works visually */
+  .players-grid .player-check { pointer-events: auto; }
 
   .player-check.selected {
     border-color: var(--purple);
-    background: rgba(139,92,246,0.1);
+    background: rgba(139,92,246,0.12);
+    transform: scale(1.01);
+  }
+
+  .player-check:hover:not(.selected) {
+    border-color: rgba(139,92,246,0.4);
   }
 
   .check-mark {
     width: 18px; height: 18px;
-    border: 2px solid var(--border);
+    border: 2px solid var(--muted);
     border-radius: 5px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: background 0.15s, border-color 0.15s;
+    font-size: 12px;
+    color: transparent;
   }
 
   .player-check.selected .check-mark {
     background: var(--purple);
     border-color: var(--purple);
+    color: white;
   }
 
   .check-mark::after {
-    content: '';
-    width: 4px; height: 8px;
-    border-right: 2px solid white;
-    border-bottom: 2px solid white;
-    transform: rotate(45deg);
-    margin-top: -2px;
-    display: none;
+    content: '✓';
+    font-size: 11px;
+    font-weight: 900;
+    color: inherit;
   }
 
-  .player-check.selected .check-mark::after { display: block; }
   .player-check-name { font-size: 12px; font-weight: 700; }
+
+  .selected-count {
+    font-size: 11px;
+    color: var(--purple);
+    font-weight: 700;
+    margin-top: 8px;
+    min-height: 18px;
+  }
 
   /* ── Buttons ── */
   .btn-primary {
@@ -285,7 +305,6 @@
   }
 
   .tc-name { font-size: 15px; font-weight: 900; }
-  .tc-date { font-size: 10px; color: var(--muted); }
 
   .tc-status {
     padding: 3px 10px;
@@ -299,12 +318,7 @@
   .status-voting   { background: rgba(245,200,66,0.12); color: var(--gold); border: 1px solid rgba(245,200,66,0.22); }
   .status-finished { background: rgba(139,92,246,0.12); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.22); }
 
-  .tc-players {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-bottom: 8px;
-  }
+  .tc-players { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
 
   .player-chip {
     padding: 3px 10px;
@@ -330,7 +344,7 @@
     color: var(--muted);
   }
 
-  /* ── Detail Modal ── */
+  /* ── Modal ── */
   .modal-overlay {
     display: none;
     position: fixed;
@@ -382,7 +396,6 @@
   }
 
   /* ── Vote Cards ── */
-  .vote-section { margin-top: 1rem; }
   .vote-title { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 10px; }
 
   .vote-grid {
@@ -404,31 +417,11 @@
   }
 
   .vote-card:hover { border-color: var(--purple); }
-
-  .vote-card.voted {
-    border-color: var(--purple);
-    background: rgba(139,92,246,0.1);
-  }
-
-  .vote-card.correct-vote {
-    border-color: var(--green);
-    background: rgba(34,197,94,0.1);
-  }
-
-  .vote-card.wrong-vote {
-    border-color: var(--red);
-    background: rgba(239,68,68,0.07);
-    opacity: 0.6;
-  }
+  .vote-card.voted { border-color: var(--purple); background: rgba(139,92,246,0.1); }
 
   .vote-player-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
   .vote-count { font-size: 10px; color: var(--muted); }
-  .vote-pct {
-    font-size: 20px;
-    font-weight: 900;
-    color: var(--purple);
-    margin-top: 4px;
-  }
+  .vote-pct { font-size: 20px; font-weight: 900; color: var(--purple); margin-top: 4px; }
 
   /* ── My vote input ── */
   .my-vote-wrap {
@@ -441,14 +434,8 @@
 
   .my-vote-label { font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.7px; }
 
-  .voter-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-
   .voter-select {
-    flex: 1;
+    width: 100%;
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -457,7 +444,7 @@
     font-size: 13px;
     padding: 9px 12px;
     outline: none;
-    min-width: 0;
+    margin-bottom: 10px;
   }
 
   .voter-select:focus { border-color: var(--purple); }
@@ -483,10 +470,11 @@
     padding: 10px 0;
     border-bottom: 1px solid rgba(30,47,80,0.4);
     font-size: 13px;
+    gap: 8px;
   }
   .bet-result-row:last-child { border-bottom: none; }
-  .bet-correct { color: var(--green); font-weight: 700; }
-  .bet-wrong   { color: var(--red);   font-weight: 700; }
+  .bet-correct { color: var(--green); font-weight: 700; white-space: nowrap; }
+  .bet-wrong   { color: var(--red);   font-weight: 700; white-space: nowrap; }
 
   /* ── Empty State ── */
   .empty-state {
@@ -499,11 +487,11 @@
   .empty-text { font-size: 14px; }
 
   /* ── Divider ── */
-  .divider {
-    height: 1px;
-    background: var(--border);
-    margin: 14px 0;
-  }
+  .divider { height: 1px; background: var(--border); margin: 14px 0; }
+
+  /* ── Progress bar for vote percentage ── */
+  .vote-bar-wrap { margin-top: 6px; height: 4px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
+  .vote-bar      { height: 100%; background: var(--purple); border-radius: 4px; transition: width 0.4s ease; }
 
   /* ── Toast ── */
   #toast {
@@ -521,6 +509,8 @@
     transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
     white-space: nowrap;
     box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    max-width: 90vw;
+    text-align: center;
   }
   #toast.show { transform: translateX(-50%) translateY(0); }
 
@@ -534,7 +524,6 @@
     display: inline-block; vertical-align: middle; margin-left: 8px;
   }
 
-  /* ── Responsive ── */
   @media (max-width: 380px) {
     .players-grid { grid-template-columns: repeat(2, 1fr); }
     .vote-grid    { grid-template-columns: repeat(2, 1fr); }
@@ -555,9 +544,9 @@
 
 <!-- ════════ TABS ════════ -->
 <div class="tabs">
-  <button class="tab active" onclick="switchTab('active')">🏟️ الجارية</button>
-  <button class="tab" onclick="switchTab('create')">➕ إنشاء</button>
-  <button class="tab" onclick="switchTab('finished')">🏆 المنتهية</button>
+  <button class="tab active" data-tab="active"   onclick="switchTab('active')">🏟️ الجارية</button>
+  <button class="tab"        data-tab="create"   onclick="switchTab('create')">➕ إنشاء</button>
+  <button class="tab"        data-tab="finished" onclick="switchTab('finished')">🏆 المنتهية</button>
 </div>
 
 <!-- ════════ PAGE ════════ -->
@@ -597,11 +586,20 @@
     </div>
 
     <div class="card">
-      <div class="card-hdr"><span>👥</span><span class="card-hdr-title">اختر اللاعبين</span></div>
+      <div class="card-hdr">
+        <span>👥</span>
+        <span class="card-hdr-title">اختر اللاعبين</span>
+      </div>
       <div class="card-body">
-        <div class="players-grid" id="playersCheckboxes">
+        <!--
+          ✅ FIX: Event delegation on the grid container.
+          Each .player-check has data-idx="N" matching allPlayers[N].
+          No CSS.escape, no getElementById("chk_"+name), no inline onclick.
+        -->
+        <div class="players-grid" id="playersCheckboxes" onclick="handlePlayerClick(event)">
           <div style="color:var(--muted);font-size:13px;padding:8px;">جاري تحميل اللاعبين...</div>
         </div>
+        <div class="selected-count" id="selectedCount"></div>
       </div>
     </div>
 
@@ -621,7 +619,7 @@
 </div>
 
 <!-- ════════ TOURNAMENT DETAIL MODAL ════════ -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+<div class="modal-overlay" id="modalOverlay">
   <div class="modal" id="modalContent">
     <div class="modal-hdr">
       <div class="modal-title" id="modalTitle">—</div>
@@ -655,27 +653,34 @@ function toast(msg, dur = 3000) {
   setTimeout(() => t.classList.remove("show"), dur);
 }
 
-/* ─────────────────────────────────────────
-   TAB SWITCHING
-───────────────────────────────────────── */
+/* ─── Tab Switching ─── */
 window.switchTab = function(id) {
-  document.querySelectorAll(".tab").forEach((t, i) => {
-    const names = ["active","create","finished"];
-    t.classList.toggle("active", names[i] === id);
+  document.querySelectorAll(".tab").forEach(t => {
+    t.classList.toggle("active", t.dataset.tab === id);
   });
   document.querySelectorAll(".tab-panel").forEach(p => {
     p.classList.toggle("active", p.id === "tab-" + id);
   });
 };
 
-/* ─────────────────────────────────────────
-   LOAD PLAYERS → CHECKBOXES
-───────────────────────────────────────── */
-let allPlayers = [];
+/* ══════════════════════════════════════════════
+   ✅ FIXED PLAYER SELECTION SYSTEM
+   
+   Problem was: CSS.escape(name) + getElementById(`chk_${CSS.escape(name)}`)
+   This fails for Arabic names and names with special chars.
+   
+   Solution: Store players in allPlayers[]. Each checkbox element
+   has data-idx="N". Clicks delegate to the grid container.
+   Toggle by finding the element with matching data-idx.
+   Selection state is tracked in selectedIndices Set.
+══════════════════════════════════════════════ */
+let allPlayers       = [];        // string[]
+let selectedIndices  = new Set(); // Set<number>
 
 onValue(ref(db, "players"), (snap) => {
   if (!snap.exists()) return;
   allPlayers = Object.keys(snap.val());
+  selectedIndices.clear();
   renderPlayerCheckboxes();
 });
 
@@ -686,25 +691,49 @@ function renderPlayerCheckboxes() {
     return;
   }
 
-  container.innerHTML = allPlayers.map(name => `
-    <label class="player-check" id="chk_${CSS.escape(name)}" onclick="toggleCheck('${name.replace(/'/g,"\\'")}')">
-      <input type="checkbox" id="cb_${name}">
+  // ✅ Each element has ONLY data-idx — no name-based IDs
+  container.innerHTML = allPlayers.map((name, idx) => `
+    <div class="player-check" data-idx="${idx}">
       <div class="check-mark"></div>
       <span class="player-check-name">${name}</span>
-    </label>
+    </div>
   `).join("");
+
+  updateSelectedCount();
 }
 
-window.toggleCheck = function(name) {
-  const el = document.getElementById(`chk_${CSS.escape(name)}`);
-  if (el) el.classList.toggle("selected");
+/* ✅ Event delegation — one listener on the grid container */
+window.handlePlayerClick = function(e) {
+  // Walk up from click target to find .player-check
+  let el = e.target;
+  while (el && el !== e.currentTarget) {
+    if (el.classList.contains("player-check")) {
+      const idx = parseInt(el.dataset.idx, 10);
+      if (isNaN(idx)) return;
+      if (selectedIndices.has(idx)) {
+        selectedIndices.delete(idx);
+        el.classList.remove("selected");
+      } else {
+        selectedIndices.add(idx);
+        el.classList.add("selected");
+      }
+      updateSelectedCount();
+      return;
+    }
+    el = el.parentElement;
+  }
 };
 
+function updateSelectedCount() {
+  const el = document.getElementById("selectedCount");
+  if (!el) return;
+  el.textContent = selectedIndices.size > 0
+    ? `✅ تم اختيار ${selectedIndices.size} لاعب: ${[...selectedIndices].map(i => allPlayers[i]).join("، ")}`
+    : "";
+}
+
 function getSelectedPlayers() {
-  return allPlayers.filter(name => {
-    const el = document.getElementById(`chk_${CSS.escape(name)}`);
-    return el && el.classList.contains("selected");
-  });
+  return [...selectedIndices].sort((a, b) => a - b).map(i => allPlayers[i]);
 }
 
 /* ─────────────────────────────────────────
@@ -716,27 +745,28 @@ window.createTournament = async function () {
   const reward  = parseInt(document.getElementById("tReward").value) || 10;
   const players = getSelectedPlayers();
 
-  if (!name)           { toast("⚠️ أدخل اسم البطولة"); return; }
-  if (players.length < 2) { toast("⚠️ اختر لاعبين على الأقل"); return; }
+  if (!name)               { toast("⚠️ أدخل اسم البطولة"); return; }
+  if (players.length < 2) { toast("⚠️ اختر لاعبَين على الأقل"); return; }
 
   const tRef = push(ref(db, "tournaments"));
   await set(tRef, {
     name,
-    desc:      desc || "",
+    desc:        desc || "",
     reward,
     players,
-    status:    "voting",   // voting | finished
-    votes:     {},
-    winner:    null,
-    createdAt: new Date().toISOString(),
+    status:      "voting",
+    votes:       {},
+    winner:      null,
+    createdAt:   new Date().toISOString(),
     createdDate: new Date().toLocaleDateString("ar-IQ")
   });
 
-  // reset form
-  document.getElementById("tName").value  = "";
-  document.getElementById("tDesc").value  = "";
+  // Reset form
+  document.getElementById("tName").value   = "";
+  document.getElementById("tDesc").value   = "";
   document.getElementById("tReward").value = "10";
-  document.querySelectorAll(".player-check").forEach(el => el.classList.remove("selected"));
+  selectedIndices.clear();
+  renderPlayerCheckboxes();
 
   toast(`✅ تم إنشاء البطولة "${name}"!`);
   window.switchTab("active");
@@ -758,15 +788,17 @@ onValue(ref(db, "tournaments"), (snap) => {
   const active   = ids.filter(id => data[id].status !== "finished");
   const finished = ids.filter(id => data[id].status === "finished");
 
-  // Render Active
+  // Sort newest first
+  active.sort((a, b) => (data[b].createdAt || "") > (data[a].createdAt || "") ? 1 : -1);
+  finished.sort((a, b) => (data[b].finishedAt || "") > (data[a].finishedAt || "") ? 1 : -1);
+
   if (active.length === 0) {
-    renderEmpty("activeTournaments", "لا توجد بطولات جارية حالياً");
+    renderEmpty("activeTournaments", "لا توجد بطولات جارية حالياً\nاضغط ➕ إنشاء لبدء بطولة جديدة");
   } else {
     document.getElementById("activeTournaments").innerHTML =
       active.map(id => renderTCard(id, data[id])).join("");
   }
 
-  // Render Finished
   if (finished.length === 0) {
     renderEmpty("finishedTournaments", "لا توجد بطولات منتهية بعد");
   } else {
@@ -779,7 +811,7 @@ function renderEmpty(containerId, msg = "لا يوجد شيء هنا بعد") {
   document.getElementById(containerId).innerHTML = `
     <div class="empty-state">
       <div class="empty-icon">🎯</div>
-      <div class="empty-text">${msg}</div>
+      <div class="empty-text">${msg.replace(/\n/g,"<br>")}</div>
     </div>`;
 }
 
@@ -789,16 +821,15 @@ function renderTCard(id, t) {
     : `<span class="tc-status status-voting">تصويت مفتوح 🗳️</span>`;
 
   const totalVotes = t.votes ? Object.keys(t.votes).length : 0;
-  const winnerChip = t.winner
-    ? `<span class="player-chip winner">🏆 ${t.winner}</span>`
-    : "";
 
   const playerChips = (t.players || [])
-    .map(p => `<span class="player-chip${t.winner === p ? " winner" : ""}">${t.winner === p ? "🏆 " : ""}${p}</span>`)
-    .join("");
+    .map(p => {
+      const isWinner = t.winner === p;
+      return `<span class="player-chip${isWinner ? " winner" : ""}">${isWinner ? "🏆 " : ""}${p}</span>`;
+    }).join("");
 
   return `
-    <div class="tournament-card" onclick="openTournament('${id}')">
+    <div class="tournament-card" data-id="${id}" onclick="openTournament(this.dataset.id)">
       <div class="tc-header">
         <div class="tc-name">${t.name}</div>
         ${status}
@@ -815,7 +846,10 @@ function renderTCard(id, t) {
 /* ─────────────────────────────────────────
    OPEN TOURNAMENT MODAL
 ───────────────────────────────────────── */
+let currentTournamentId = null;
+
 window.openTournament = async function (id) {
+  currentTournamentId = id;
   const snap = await get(ref(db, `tournaments/${id}`));
   if (!snap.exists()) return;
 
@@ -824,17 +858,13 @@ window.openTournament = async function (id) {
 
   let html = "";
 
-  // Description
   if (t.desc) {
     html += `<div style="font-size:12px;color:var(--muted);margin-bottom:14px;">${t.desc}</div>`;
   }
 
-  // ── FINISHED ──
   if (t.status === "finished") {
     html += renderFinishedModal(t);
-  }
-  // ── VOTING ──
-  else {
+  } else {
     html += renderVotingModal(id, t);
   }
 
@@ -842,37 +872,37 @@ window.openTournament = async function (id) {
   document.getElementById("modalOverlay").classList.add("open");
 };
 
+/* ─── Finished Modal ─── */
 function renderFinishedModal(t) {
-  const votes     = t.votes || {};
+  const votes      = t.votes || {};
   const voteCounts = countVotes(votes, t.players);
-  const total     = Object.values(votes).length;
+  const total      = Object.values(votes).length;
 
   let html = `
     <div class="result-banner">
       <div class="result-trophy">🏆</div>
       <div class="result-winner">${t.winner}</div>
-      <div class="result-sub">الفائز الرسمي بالبطولة</div>
+      <div class="result-sub">الفائز الرسمي بالبطولة · ${t.finishedDate || ""}</div>
     </div>`;
 
-  // Vote breakdown
-  html += `<div class="vote-title">توزيع الأصوات</div>
+  html += `<div class="vote-title">توزيع الأصوات (${total} صوت)</div>
     <div class="vote-grid">`;
 
   (t.players || []).forEach(p => {
     const cnt = voteCounts[p] || 0;
     const pct = total > 0 ? Math.round(cnt / total * 100) : 0;
-    const isWinner = p === t.winner;
+    const isW = p === t.winner;
     html += `
-      <div class="vote-card" style="${isWinner ? "border-color:var(--gold);background:rgba(245,200,66,0.08);" : ""}">
-        <div class="vote-player-name">${isWinner ? "🏆 " : ""}${p}</div>
-        <div class="vote-pct" style="${isWinner ? "color:var(--gold);" : ""}">${pct}%</div>
+      <div class="vote-card" style="${isW ? "border-color:var(--gold);background:rgba(245,200,66,0.08);" : ""}">
+        <div class="vote-player-name">${isW ? "🏆 " : ""}${p}</div>
+        <div class="vote-pct" style="${isW ? "color:var(--gold);" : ""}">${pct}%</div>
         <div class="vote-count">${cnt} صوت</div>
+        <div class="vote-bar-wrap"><div class="vote-bar" style="width:${pct}%;${isW?"background:var(--gold);":""}"></div></div>
       </div>`;
   });
 
   html += `</div>`;
 
-  // Bet results
   if (Object.keys(votes).length > 0) {
     html += `<div class="vote-title">نتائج الرهانات</div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">`;
@@ -881,7 +911,7 @@ function renderFinishedModal(t) {
       const correct = pickedPlayer === t.winner;
       html += `
         <div class="bet-result-row">
-          <span style="font-weight:700;">${voter}</span>
+          <span style="font-weight:700;flex:1;">${voter}</span>
           <span style="font-size:11px;color:var(--muted);">← ${pickedPlayer}</span>
           <span class="${correct ? "bet-correct" : "bet-wrong"}">
             ${correct ? `+${t.reward || 10} نقطة ✅` : "خطأ ❌"}
@@ -895,31 +925,35 @@ function renderFinishedModal(t) {
   return html;
 }
 
+/* ─── Voting Modal ─── */
+let selectedVote = null;
+
 function renderVotingModal(id, t) {
-  const votes     = t.votes || {};
+  const votes      = t.votes || {};
   const voteCounts = countVotes(votes, t.players);
-  const total     = Object.values(votes).length;
+  const total      = Object.values(votes).length;
 
   let html = `
     <div class="my-vote-wrap">
       <div class="my-vote-label">🗳️ ضع تصويتك — اختر اسمك والفائز المتوقع</div>
-      <div class="voter-row">
-        <select class="voter-select" id="voterName">
-          <option value="">أنا: اختر اسمك</option>
-          ${allPlayers.map(p => `<option value="${p}">${p}</option>`).join("")}
-        </select>
-      </div>
-      <div class="vote-title" style="margin-top:4px;">اختر الفائز المتوقع:</div>
-      <div class="vote-grid" id="voteGrid">`;
+      <select class="voter-select" id="voterName">
+        <option value="">👤 أنا: اختر اسمك</option>
+        ${allPlayers.map(p => `<option value="${p}">${p}</option>`).join("")}
+      </select>
+
+      <div class="vote-title">اختر الفائز المتوقع:</div>
+      <div class="vote-grid">`;
 
   (t.players || []).forEach(p => {
     const cnt = voteCounts[p] || 0;
     const pct = total > 0 ? Math.round(cnt / total * 100) : 0;
+    // ✅ Use data-player attribute, handle click via delegation
     html += `
-      <div class="vote-card" id="vc_${p}" onclick="selectVote('${p.replace(/'/g,"\\'")}')">
+      <div class="vote-card" data-player="${p}" onclick="selectVoteCard(this, '${p.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">
         <div class="vote-player-name">${p}</div>
         <div class="vote-pct">${pct}%</div>
         <div class="vote-count">${cnt} صوت</div>
+        <div class="vote-bar-wrap"><div class="vote-bar" style="width:${pct}%"></div></div>
       </div>`;
   });
 
@@ -927,7 +961,7 @@ function renderVotingModal(id, t) {
       <button class="btn-primary" onclick="submitVote('${id}')">✅ تأكيد التصويت</button>
     </div>`;
 
-  // Live votes display
+  // Live votes
   if (total > 0) {
     html += `<div class="vote-title">الأصوات الحالية (${total} صوت)</div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">`;
@@ -935,7 +969,7 @@ function renderVotingModal(id, t) {
     for (let [voter, picked] of Object.entries(votes)) {
       html += `
         <div class="bet-result-row">
-          <span style="font-weight:700;">${voter}</span>
+          <span style="font-weight:700;flex:1;">${voter}</span>
           <span style="font-size:12px;color:#a5b4fc;">→ ${picked}</span>
         </div>`;
     }
@@ -947,37 +981,33 @@ function renderVotingModal(id, t) {
   html += `
     <div class="divider"></div>
     <div class="vote-title">🔑 إنهاء البطولة (إدارة فقط)</div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;">
       <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">اختر الفائز الرسمي لإنهاء البطولة وتوزيع النقاط</div>
-      <select class="voter-select" id="winnerSelect" style="margin-bottom:10px;width:100%;">
+      <select class="voter-select" id="winnerSelect" style="margin-bottom:10px;">
         <option value="">اختر الفائز الرسمي...</option>
         ${(t.players || []).map(p => `<option value="${p}">${p}</option>`).join("")}
       </select>
-      <button class="btn-success" onclick="finishTournament('${id}', ${JSON.stringify(t).replace(/'/g,"\\'")} )">
-        🏁 تحديد الفائز وإنهاء البطولة
-      </button>
-      <button class="btn-danger" style="margin-right:8px;margin-top:8px;" onclick="deleteTournament('${id}')">
-        🗑️ حذف البطولة
-      </button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-success" onclick="finishTournament('${id}')">🏁 تحديد الفائز وإنهاء البطولة</button>
+        <button class="btn-danger"  onclick="deleteTournament('${id}')">🗑️ حذف البطولة</button>
+      </div>
     </div>`;
 
   return html;
 }
 
-/* ─── Helpers ─── */
-let selectedVote = null;
-
-window.selectVote = function(playerName) {
+/* ─── Select Vote Card ─── */
+window.selectVoteCard = function(el, playerName) {
   selectedVote = playerName;
-  document.querySelectorAll(".vote-card").forEach(el => el.classList.remove("voted"));
-  const el = document.getElementById(`vc_${playerName}`);
-  if (el) el.classList.add("voted");
+  document.querySelectorAll("#modalBody .vote-card").forEach(c => c.classList.remove("voted"));
+  el.classList.add("voted");
 };
 
+/* ─── Count Votes ─── */
 function countVotes(votes, players) {
   const counts = {};
   (players || []).forEach(p => counts[p] = 0);
-  Object.values(votes).forEach(v => { if (counts[v] !== undefined) counts[v]++; });
+  Object.values(votes).forEach(v => { if (v in counts) counts[v]++; });
   return counts;
 }
 
@@ -989,7 +1019,6 @@ window.submitVote = async function(id) {
   if (!voter)       { toast("⚠️ اختر اسمك أولاً"); return; }
   if (!selectedVote){ toast("⚠️ اختر اللاعب المتوقع فوزه"); return; }
 
-  // Check if already voted
   const existingSnap = await get(ref(db, `tournaments/${id}/votes/${voter}`));
   if (existingSnap.exists()) {
     toast(`⚠️ ${voter} صوّت مسبقاً على "${existingSnap.val()}"`);
@@ -1000,14 +1029,13 @@ window.submitVote = async function(id) {
   toast(`✅ تم تسجيل تصويت ${voter} على "${selectedVote}"`);
   selectedVote = null;
 
-  // Refresh modal
   closeModal();
   setTimeout(() => openTournament(id), 300);
 };
 
 /* ─────────────────────────────────────────
    FINISH TOURNAMENT
-   ✅ توزيع النقاط على من اختار الفائز
+   ✅ يوزع النقاط على من توقع الفائز بشكل صحيح
 ───────────────────────────────────────── */
 window.finishTournament = async function(id) {
   const winner = document.getElementById("winnerSelect")?.value;
@@ -1022,14 +1050,12 @@ window.finishTournament = async function(id) {
   const votes  = t.votes || {};
   const reward = t.reward || 10;
 
-  // حساب الفائزين بالرهان
   const updates = {};
-  const winners = [];
+  const betWinners = [];
 
   for (let [voter, picked] of Object.entries(votes)) {
     if (picked === winner) {
-      winners.push(voter);
-      // أضف نقاط للاعب الذي توقع صح
+      betWinners.push(voter);
       const playerSnap = await get(ref(db, `players/${voter}`));
       if (playerSnap.exists()) {
         const curPts = playerSnap.val().points || 0;
@@ -1040,18 +1066,17 @@ window.finishTournament = async function(id) {
     }
   }
 
-  // تحديث البطولة
-  updates[`tournaments/${id}/status`]     = "finished";
-  updates[`tournaments/${id}/winner`]     = winner;
-  updates[`tournaments/${id}/finishedAt`] = new Date().toISOString();
-  updates[`tournaments/${id}/finishedDate`] = new Date().toLocaleDateString("ar-IQ");
-  updates[`tournaments/${id}/betWinners`] = winners;
+  updates[`tournaments/${id}/status`]      = "finished";
+  updates[`tournaments/${id}/winner`]      = winner;
+  updates[`tournaments/${id}/finishedAt`]  = new Date().toISOString();
+  updates[`tournaments/${id}/finishedDate`]= new Date().toLocaleDateString("ar-IQ");
+  updates[`tournaments/${id}/betWinners`]  = betWinners;
 
   await update(ref(db), updates);
 
-  const msg = winners.length > 0
-    ? `🏆 انتهت البطولة! الفائز: ${winner}\n🎁 حصل ${winners.join("، ")} على ${reward} نقطة`
-    : `🏆 انتهت البطولة! الفائز: ${winner}\n😅 لا أحد توقع الفوز`;
+  const msg = betWinners.length > 0
+    ? `🏆 الفائز: ${winner}\n🎁 ${betWinners.join("، ")} حصلوا على ${reward} نقطة`
+    : `🏆 الفائز: ${winner} · لا أحد توقع الفوز 😅`;
 
   toast(msg, 4000);
   closeModal();
@@ -1067,11 +1092,15 @@ window.deleteTournament = async function(id) {
 };
 
 /* ─── Modal ─── */
-window.closeModal = function(e) {
-  if (e && e.target !== document.getElementById("modalOverlay")) return;
+window.closeModal = function() {
   document.getElementById("modalOverlay").classList.remove("open");
   selectedVote = null;
 };
+
+// Close modal when clicking overlay background
+document.getElementById("modalOverlay").addEventListener("click", function(e) {
+  if (e.target === this) closeModal();
+});
 
 /* ─── getLeague ─── */
 function getLeague(p) {
