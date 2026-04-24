@@ -14,7 +14,6 @@
     min-height: 100vh;
   }
 
-  /* ── الهيدر ── */
   .header {
     background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
     border-bottom: 1px solid #1e293b;
@@ -29,12 +28,34 @@
     margin-bottom: 6px;
   }
 
-  .header-sub {
-    font-size: 13px;
-    color: #475569;
+  .header-sub { font-size: 13px; color: #475569; }
+
+  /* ── Season Badge ── */
+  .season-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(234,179,8,0.1);
+    border: 1px solid rgba(234,179,8,0.25);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 12px;
+    color: #fbbf24;
+    margin-top: 8px;
   }
 
-  /* ── الأزرار ── */
+  .season-badge .dot {
+    width: 6px; height: 6px;
+    background: #22c55e;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%      { opacity:0.4; transform:scale(1.3); }
+  }
+
   .actions {
     display: flex;
     gap: 10px;
@@ -61,15 +82,12 @@
 
   .btn:active { transform: scale(0.96); opacity: 0.85; }
   .btn-icon { font-size: 20px; }
-
   .btn-green  { background: linear-gradient(135deg, #16a34a, #15803d); }
   .btn-blue   { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
   .btn-amber  { background: linear-gradient(135deg, #d97706, #b45309); }
 
-  /* ── الصفحة الداخلية ── */
   .page { max-width: 600px; margin: auto; padding: 0 1rem 3rem; }
 
-  /* ── الدوريات ── */
   .section-title {
     font-size: 13px;
     color: #64748b;
@@ -97,7 +115,6 @@
   .league-card .l-num  { font-size: 12px; font-weight: 700; color: #f1f5f9; margin-bottom: 2px; }
   .league-card .l-pts  { font-size: 10px; color: #64748b; line-height: 1.3; }
 
-  /* ── بطاقة الجدول ── */
   .table-card {
     background: #1e293b;
     border: 1px solid #334155;
@@ -124,19 +141,9 @@
     animation: pulse 2s infinite;
   }
 
-  @keyframes pulse {
-    0%,100% { opacity: 1; transform: scale(1); }
-    50%      { opacity: 0.4; transform: scale(1.3); }
-  }
-
   .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 340px;
-  }
-
+  table { width: 100%; border-collapse: collapse; min-width: 340px; }
   thead tr { background: #0f172a; }
 
   th {
@@ -161,15 +168,11 @@
   tbody tr { transition: background 0.15s; }
   tbody tr:hover td { background: rgba(255,255,255,0.03); }
 
-  /* صف الأول */
   .row-top td { background: rgba(5,150,105,0.12); }
   .row-top:hover td { background: rgba(5,150,105,0.18) !important; }
-
-  /* صفوف الأخيرين */
   .row-bottom td { background: rgba(127,29,29,0.15); }
   .row-bottom:hover td { background: rgba(127,29,29,0.22) !important; }
 
-  /* رتبة */
   .rank-badge {
     width: 28px; height: 28px;
     border-radius: 8px;
@@ -185,21 +188,13 @@
   .rank-3 { background: rgba(180,83,9,0.2);    color: #f97316; }
   .rank-n { background: rgba(51,65,85,0.5);    color: #64748b; }
 
-  /* اسم اللاعب */
-  a {
-    color: #f1f5f9;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-  }
-
+  a { color: #f1f5f9; text-decoration: none; font-weight: 600; font-size: 14px; }
   a:hover { color: #60a5fa; }
 
   .win    { color: #22c55e; font-weight: 600; }
   .loss   { color: #ef4444; font-weight: 600; }
   .streak { color: #f97316; font-weight: 600; }
 
-  /* شارة الدوري */
   .league-pill {
     display: inline-block;
     padding: 2px 10px;
@@ -210,17 +205,33 @@
     color: #a5b4fc;
     border: 1px solid rgba(99,102,241,0.25);
   }
+
+  /* ── Season Ended Banner ── */
+  .season-ended-banner {
+    background: rgba(234,179,8,0.08);
+    border: 1px solid rgba(234,179,8,0.2);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #fbbf24;
+  }
 </style>
 </head>
 <body>
 
-<!-- الهيدر -->
 <div class="header">
   <div class="header-title">🏆 دوري الدومينو</div>
   <div class="header-sub">جدول الترتيب المباشر</div>
+  <div class="season-badge">
+    <div class="dot"></div>
+    <span id="seasonLabel">جاري التحميل...</span>
+  </div>
 </div>
 
-<!-- الأزرار -->
 <div class="actions">
   <button class="btn btn-green" onclick="goToAddMatch()">
     <span class="btn-icon">➕</span> إضافة مباراة
@@ -235,7 +246,10 @@
 
 <div class="page">
 
-  <!-- الدوريات -->
+  <div id="seasonEndedBanner" style="display:none;" class="season-ended-banner">
+    🏁 انتهى الموسم الحالي — انتظر بدء الموسم الجديد من لوحة الإدارة
+  </div>
+
   <div class="section-title">مستويات الدوري</div>
   <div class="leagues-grid">
     <div class="league-card">
@@ -265,11 +279,10 @@
     </div>
   </div>
 
-  <!-- جدول الترتيب -->
   <div class="table-card">
     <div class="table-header">
       <span class="table-header-title">📊 جدول الترتيب</span>
-      <div class="live-dot" title="يتحدث كل 5 ثوانٍ"></div>
+      <div class="live-dot" title="يتحدث كل 10 ثوانٍ"></div>
     </div>
     <div class="table-wrap">
       <table>
@@ -293,7 +306,9 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+import {
+  getDatabase, ref, get, set, update
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC7EVNCSl48CQgIC_a8wdC5UG2tKLtNKjQ",
@@ -306,35 +321,17 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const db  = getDatabase(app);
 
+/* ─────────────────────────────────────────
+   مساعدات
+───────────────────────────────────────── */
 function getLeague(points) {
   if (points >= 300) return 1;
   if (points >= 200) return 2;
   if (points >= 120) return 3;
   if (points >= 60)  return 4;
   return 5;
-}
-
-async function checkSeasonEnd() {
-  const today = new Date();
-  if (today.getDay() === 5) {
-    const snapshot = await get(ref(db, "players"));
-    if (!snapshot.exists()) return;
-    let players = snapshot.val();
-    let list = Object.entries(players).map(([name, data]) => ({ name, ...data }));
-    list.sort((a, b) => b.points - a.points);
-    if (list.length >= 4) {
-      list[0].points += 20;
-      list[1].points += 10;
-      list[list.length - 1].points -= 20;
-      list[list.length - 2].points -= 10;
-    }
-    for (let p of list) {
-      p.league = getLeague(p.points);
-      await set(ref(db, "players/" + p.name), p);
-    }
-  }
 }
 
 function rankBadge(i) {
@@ -344,10 +341,100 @@ function rankBadge(i) {
   return `<span class="rank-badge rank-n">${i + 1}</span>`;
 }
 
-async function loadPlayers() {
-  await checkSeasonEnd();
-  const snapshot = await get(ref(db, "players"));
+/* ─────────────────────────────────────────
+   إنهاء الموسم (آمنة من التكرار)
+   ✅ تعمل فقط يوم الجمعة
+   ✅ تتحقق من seasonEnded قبل التنفيذ
+   ✅ تضع seasonEnded=true بعد التنفيذ
+───────────────────────────────────────── */
+async function checkSeasonEnd() {
+  // 1) تحقق من اليوم أولاً (الجمعة = 5)
+  const today = new Date();
+  if (today.getDay() !== 5) return;
 
+  // 2) اقرأ حالة الموسم من Firebase
+  const metaSnap = await get(ref(db, "seasonMeta"));
+  const meta     = metaSnap.exists() ? metaSnap.val() : {};
+
+  // 3) إذا انتهى الموسم مسبقاً → لا تفعل شيئاً
+  if (meta.seasonEnded === true) return;
+
+  // 4) اقرأ اللاعبين
+  const playersSnap = await get(ref(db, "players"));
+  if (!playersSnap.exists()) return;
+
+  let list = Object.entries(playersSnap.val())
+    .map(([name, data]) => ({ name, ...data }))
+    .sort((a, b) => b.points - a.points);
+
+  if (list.length < 4) return; // لا يكفي للترتيب
+
+  // 5) أرشفة الموسم أولاً
+  const seasonNumber = (meta.seasonNumber || 0) + 1;
+  const seasonId     = `season_${seasonNumber}`;
+  const top10 = list.slice(0, 10).map(p => ({
+    name:   p.name,
+    points: p.points,
+    league: getLeague(p.points),
+    wins:   p.wins   || 0,
+    losses: p.losses || 0,
+    streak: p.streak || 0
+  }));
+
+  await set(ref(db, `seasons/${seasonId}`), {
+    seasonNumber,
+    winner:      list[0].name,
+    winnerPoints: list[0].points,
+    top10,
+    endedAt: new Date().toISOString(),
+    endedDate: today.toLocaleDateString("ar-IQ")
+  });
+
+  // 6) تحديث نقاط اللاعبين (مرة واحدة فقط)
+  const updates = {};
+  list[0].points += 20;
+  list[1].points += 10;
+  list[list.length - 2].points -= 10;
+  list[list.length - 1].points -= 20;
+
+  for (let p of list) {
+    // لا تسمح بنقاط سالبة
+    p.points = Math.max(0, p.points);
+    updates[`players/${p.name}/points`] = p.points;
+    updates[`players/${p.name}/league`] = getLeague(p.points);
+  }
+
+  // 7) ضع seasonEnded = true في نفس العملية
+  updates["seasonMeta/seasonEnded"]  = true;
+  updates["seasonMeta/seasonNumber"] = seasonNumber;
+  updates["seasonMeta/lastEndDate"]  = today.toISOString();
+
+  await update(ref(db), updates);
+
+  console.log(`✅ انتهى الموسم ${seasonNumber} بنجاح`);
+}
+
+/* ─────────────────────────────────────────
+   تحميل اللاعبين وعرضهم
+───────────────────────────────────────── */
+async function loadPlayers() {
+  // تشغيل checkSeasonEnd بشكل منفصل (لا يوقف العرض إذا فشل)
+  checkSeasonEnd().catch(err => console.warn("checkSeasonEnd error:", err));
+
+  // اقرأ seasonMeta لعرض شارة الموسم
+  const metaSnap = await get(ref(db, "seasonMeta"));
+  const meta = metaSnap.exists() ? metaSnap.val() : {};
+
+  const seasonNum = meta.seasonNumber || 1;
+  document.getElementById("seasonLabel").textContent =
+    `الموسم ${seasonNum}${meta.seasonEnded ? " — انتهى" : " — جارٍ"}`;
+
+  // عرض/إخفاء بانر انتهاء الموسم
+  document.getElementById("seasonEndedBanner").style.display =
+    meta.seasonEnded ? "flex" : "none";
+
+  // اقرأ اللاعبين
+  const snapshot = await get(ref(db, "players"));
   if (!snapshot.exists()) {
     document.getElementById("table").innerHTML =
       `<tr><td colspan="7" style="text-align:center;color:#475569;padding:24px;">لا يوجد لاعبين بعد</td></tr>`;
@@ -367,10 +454,10 @@ async function loadPlayers() {
     html += `
       <tr class="${rowClass}">
         <td>${rankBadge(i)}</td>
-        <td><a href="player.html?name=${p.name}">${p.name}</a></td>
+        <td><a href="player.html?name=${encodeURIComponent(p.name)}">${p.name}</a></td>
         <td style="font-weight:700;color:#f1f5f9;">${p.points}</td>
-        <td><span class="league-pill">الدوري ${p.league}</span></td>
-        <td class="win">${p.wins || 0}</td>
+        <td><span class="league-pill">الدوري ${p.league || getLeague(p.points)}</span></td>
+        <td class="win">${p.wins   || 0}</td>
         <td class="loss">${p.losses || 0}</td>
         <td class="streak">${p.streak || 0}</td>
       </tr>`;
@@ -379,8 +466,9 @@ async function loadPlayers() {
   document.getElementById("table").innerHTML = html;
 }
 
+// تحميل أولي + تحديث كل 10 ثواني (بدلاً من 5 لتخفيف الطلبات)
 loadPlayers();
-setInterval(loadPlayers, 5000);
+setInterval(loadPlayers, 10000);
 </script>
 
 <script>
