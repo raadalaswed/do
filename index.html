@@ -32,7 +32,6 @@
     overflow-x: hidden;
   }
 
-  /* ── Starfield BG ── */
   body::before {
     content: '';
     position: fixed;
@@ -138,26 +137,10 @@
   .btn:active { transform: scale(0.95); }
   .btn-icon { font-size: 20px; }
 
-  .btn-green  {
-    background: linear-gradient(135deg, #16a34a, #15803d);
-    border-color: rgba(34,197,94,0.3);
-    box-shadow: 0 4px 16px rgba(22,163,74,0.25);
-  }
-  .btn-blue   {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    border-color: rgba(59,130,246,0.3);
-    box-shadow: 0 4px 16px rgba(37,99,235,0.25);
-  }
-  .btn-amber  {
-    background: linear-gradient(135deg, #d97706, #b45309);
-    border-color: rgba(217,119,6,0.3);
-    box-shadow: 0 4px 16px rgba(217,119,6,0.25);
-  }
-  .btn-purple {
-    background: linear-gradient(135deg, #7c3aed, #6d28d9);
-    border-color: rgba(124,58,237,0.3);
-    box-shadow: 0 4px 16px rgba(124,58,237,0.25);
-  }
+  .btn-green  { background: linear-gradient(135deg, #16a34a, #15803d); border-color: rgba(34,197,94,0.3); box-shadow: 0 4px 16px rgba(22,163,74,0.25); }
+  .btn-blue   { background: linear-gradient(135deg, #2563eb, #1d4ed8); border-color: rgba(59,130,246,0.3); box-shadow: 0 4px 16px rgba(37,99,235,0.25); }
+  .btn-amber  { background: linear-gradient(135deg, #d97706, #b45309); border-color: rgba(217,119,6,0.3); box-shadow: 0 4px 16px rgba(217,119,6,0.25); }
+  .btn-purple { background: linear-gradient(135deg, #7c3aed, #6d28d9); border-color: rgba(124,58,237,0.3); box-shadow: 0 4px 16px rgba(124,58,237,0.25); }
 
   /* ── Page body ── */
   .page {
@@ -184,6 +167,120 @@
   }
 
   .ended-banner.show { display: flex; }
+
+  /* ── Previous Season Champion ── */
+  .prev-champ-banner {
+    display: none;
+    background: linear-gradient(135deg, rgba(245,200,66,0.1), rgba(245,200,66,0.04));
+    border: 1px solid rgba(245,200,66,0.3);
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .prev-champ-banner.show { display: flex; }
+
+  .champ-trophy {
+    font-size: 36px;
+    filter: drop-shadow(0 0 12px rgba(245,200,66,0.5));
+    flex-shrink: 0;
+  }
+
+  .champ-info { flex: 1; min-width: 0; }
+
+  .champ-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+
+  .champ-name {
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--gold);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .champ-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .champ-pts {
+    font-size: 12px;
+    color: var(--muted);
+    background: rgba(245,200,66,0.08);
+    border: 1px solid rgba(245,200,66,0.15);
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-weight: 700;
+  }
+
+  .champ-season {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ── Active Tournaments Mini ── */
+  .active-tournaments-mini {
+    display: none;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+
+  .active-tournaments-mini.show { display: block; }
+
+  .mini-tour-hdr {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--purple);
+  }
+
+  .mini-tour-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(30,47,80,0.4);
+    cursor: pointer;
+    transition: background 0.15s;
+    gap: 10px;
+  }
+
+  .mini-tour-item:last-child { border-bottom: none; }
+  .mini-tour-item:hover { background: rgba(139,92,246,0.05); }
+
+  .mini-tour-name { font-size: 13px; font-weight: 700; }
+  .mini-tour-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: rgba(245,200,66,0.12);
+    color: var(--gold);
+    border: 1px solid rgba(245,200,66,0.22);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .mini-tour-votes { font-size: 11px; color: var(--muted); }
 
   /* ── League Tiers ── */
   .section-label {
@@ -250,12 +347,7 @@
 
   .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 360px;
-  }
-
+  table { width: 100%; border-collapse: collapse; min-width: 360px; }
   thead tr { background: rgba(6,11,24,0.8); }
 
   th {
@@ -278,20 +370,14 @@
   }
 
   tbody tr:last-child td { border-bottom: none; }
-
-  tbody tr {
-    transition: background 0.15s;
-    cursor: default;
-  }
-
+  tbody tr { transition: background 0.15s; cursor: default; }
   tbody tr:hover td { background: rgba(59,130,246,0.04); }
 
-  .row-top td     { background: rgba(34,197,94,0.06); }
-  .row-top:hover td { background: rgba(34,197,94,0.1) !important; }
-  .row-bot td     { background: rgba(239,68,68,0.06); }
-  .row-bot:hover td { background: rgba(239,68,68,0.1) !important; }
+  .row-top td      { background: rgba(34,197,94,0.06); }
+  .row-top:hover td{ background: rgba(34,197,94,0.1) !important; }
+  .row-bot td      { background: rgba(239,68,68,0.06); }
+  .row-bot:hover td{ background: rgba(239,68,68,0.1) !important; }
 
-  /* ── Rank Badges ── */
   .rank {
     width: 28px; height: 28px;
     border-radius: 8px;
@@ -305,9 +391,8 @@
   .r1 { background: rgba(245,200,66,0.18); color: var(--gold);   }
   .r2 { background: rgba(157,180,200,0.18); color: var(--silver); }
   .r3 { background: rgba(208,112,64,0.18);  color: var(--bronze); }
-  .rn { background: rgba(74,95,130,0.25);   color: var(--muted);  font-size:12px; }
+  .rn { background: rgba(74,95,130,0.25);   color: var(--muted); font-size:12px; }
 
-  /* ── Player Link ── */
   .player-link {
     color: var(--text);
     text-decoration: none;
@@ -315,10 +400,8 @@
     font-size: 13px;
     transition: color 0.15s;
   }
-
   .player-link:hover { color: #60a5fa; }
 
-  /* ── Stats ── */
   .pts-val  { font-weight: 800; color: var(--text); font-size: 14px; }
   .win-val  { color: var(--green); font-weight: 700; }
   .loss-val { color: var(--red);   font-weight: 700; }
@@ -335,13 +418,7 @@
     border: 1px solid rgba(99,102,241,0.2);
   }
 
-  /* ── Loading ── */
-  .loader-row td {
-    text-align: center;
-    padding: 32px;
-    color: var(--muted);
-    font-size: 13px;
-  }
+  .loader-row td { text-align: center; padding: 32px; color: var(--muted); font-size: 13px; }
 
   @keyframes spin { to { transform: rotate(360deg); } }
   .spinner {
@@ -355,7 +432,6 @@
     margin-left: 8px;
   }
 
-  /* ── Responsive tweaks ── */
   @media (max-width: 400px) {
     .actions { gap: 6px; padding: 0.8rem 0.6rem; }
     .btn { font-size: 10px; padding: 10px 4px 8px; border-radius: 10px; }
@@ -365,6 +441,7 @@
     .tier-icon { font-size: 13px; }
     .tier-name { font-size: 9px; }
     .tier-pts  { font-size: 8px; }
+    .prev-champ-banner { flex-direction: column; text-align: center; }
   }
 </style>
 </head>
@@ -403,6 +480,25 @@
   <!-- Ended Banner -->
   <div class="ended-banner" id="endedBanner">
     🏁 انتهى الموسم الحالي — انتظر بدء الموسم الجديد من لوحة الإدارة
+  </div>
+
+  <!-- ✨ Previous Season Champion Banner -->
+  <div class="prev-champ-banner" id="prevChampBanner">
+    <div class="champ-trophy">🏆</div>
+    <div class="champ-info">
+      <div class="champ-label">🥇 بطل الموسم السابق</div>
+      <div class="champ-name" id="prevChampName">—</div>
+      <div class="champ-meta">
+        <span class="champ-pts" id="prevChampPts">0 نقطة</span>
+        <span class="champ-season" id="prevChampSeason"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Tournaments Mini Display -->
+  <div class="active-tournaments-mini" id="activeToursMini">
+    <div class="mini-tour-hdr">🎯 بطولات جارية</div>
+    <div id="activeToursList"></div>
   </div>
 
   <!-- Tiers -->
@@ -449,7 +545,7 @@
 </div>
 
 <script type="module">
-import { initializeApp }          from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { initializeApp }             from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
 const firebaseConfig = {
@@ -465,7 +561,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
 
-/* ─── Helpers ─── */
 function getLeague(p) {
   if (p >= 300) return 1;
   if (p >= 200) return 2;
@@ -481,17 +576,11 @@ function rankBadge(i) {
   return `<span class="rank rn">${i + 1}</span>`;
 }
 
-/* ─────────────────────────────────────────
-   REALTIME LISTENERS — بدلاً من polling
-   هذا يحل مشكلة التأخر في التحديث
-───────────────────────────────────────── */
-
-// Listener 1: seasonMeta (مصدر الحقيقة الوحيد للموسم)
+/* ── seasonMeta ── */
 onValue(ref(db, "seasonMeta"), (snap) => {
-  const meta   = snap.exists() ? snap.val() : {};
-  const num    = meta.seasonNumber || 1;
-  // ✅ قراءة موثوقة: نتأكد أن القيمة boolean true وليس أي قيمة أخرى
-  const ended  = meta.seasonEnded === true;
+  const meta  = snap.exists() ? snap.val() : {};
+  const num   = meta.seasonNumber || 1;
+  const ended = meta.seasonEnded === true;
 
   const label  = document.getElementById("seasonLabel");
   const badge  = document.getElementById("seasonBadge");
@@ -513,7 +602,26 @@ onValue(ref(db, "seasonMeta"), (snap) => {
   }
 });
 
-// Listener 2: players (تحديث فوري عند أي تغيير)
+/* ── Previous Season Champion ── */
+onValue(ref(db, "seasons"), (snap) => {
+  if (!snap.exists()) return;
+
+  const data = snap.val();
+  const ids  = Object.keys(data);
+  if (ids.length === 0) return;
+
+  // أحدث موسم منتهٍ
+  ids.sort((a, b) => (data[b].seasonNumber || 0) - (data[a].seasonNumber || 0));
+  const latest = data[ids[0]];
+
+  const banner = document.getElementById("prevChampBanner");
+  document.getElementById("prevChampName").textContent   = latest.winner || "—";
+  document.getElementById("prevChampPts").textContent    = `${latest.winnerPoints || 0} نقطة`;
+  document.getElementById("prevChampSeason").textContent = `الموسم ${latest.seasonNumber || ""}`;
+  banner.classList.add("show");
+});
+
+/* ── players ── */
 onValue(ref(db, "players"), (snap) => {
   const tbody = document.getElementById("tableBody");
 
@@ -545,6 +653,35 @@ onValue(ref(db, "players"), (snap) => {
   });
 
   tbody.innerHTML = html;
+});
+
+/* ── Active Tournaments Mini ── */
+onValue(ref(db, "tournaments"), (snap) => {
+  if (!snap.exists()) return;
+
+  const data   = snap.val();
+  const active = Object.entries(data).filter(([, t]) => t.status !== "finished");
+
+  const container = document.getElementById("activeToursMini");
+  const listEl    = document.getElementById("activeToursList");
+
+  if (active.length === 0) {
+    container.classList.remove("show");
+    return;
+  }
+
+  container.classList.add("show");
+  listEl.innerHTML = active.map(([id, t]) => {
+    const votes = t.votes ? Object.keys(t.votes).length : 0;
+    return `
+      <div class="mini-tour-item" onclick="location.href='tournaments.html'">
+        <div>
+          <div class="mini-tour-name">${t.name}</div>
+          <div class="mini-tour-votes">🗳️ ${votes} صوت · 🎁 ${t.reward || 10} نقطة</div>
+        </div>
+        <span class="mini-tour-badge">تصويت مفتوح</span>
+      </div>`;
+  }).join("");
 });
 </script>
 
