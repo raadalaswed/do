@@ -183,17 +183,25 @@
     white-space: nowrap;
   }
 
-  .pill-active {
-    background: rgba(34,197,94,0.12);
-    color: #4ade80;
-    border: 1px solid rgba(34,197,94,0.25);
-  }
+  .pill-active { background: rgba(34,197,94,0.12); color: #4ade80; border: 1px solid rgba(34,197,94,0.25); }
+  .pill-ended  { background: rgba(239,68,68,0.12); color: #fca5a5; border: 1px solid rgba(239,68,68,0.25); }
 
-  .pill-ended {
-    background: rgba(239,68,68,0.12);
-    color: #fca5a5;
-    border: 1px solid rgba(239,68,68,0.25);
+  /* ── Current Champion Box (shows when active season has previous winner) ── */
+  .current-champ-box {
+    display: none;
+    background: linear-gradient(135deg, rgba(245,200,66,0.08), rgba(245,200,66,0.03));
+    border: 1px solid rgba(245,200,66,0.25);
+    border-radius: 13px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    align-items: center;
+    gap: 12px;
   }
+  .current-champ-box.show { display: flex; }
+  .cc-icon { font-size: 28px; flex-shrink: 0; }
+  .cc-label { font-size: 10px; color: var(--muted); font-weight: 700; letter-spacing: 0.8px; margin-bottom: 2px; }
+  .cc-name  { font-size: 16px; font-weight: 900; color: var(--gold); }
+  .cc-pts   { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
   /* ── Season Actions ── */
   .season-actions {
@@ -221,24 +229,10 @@
   }
 
   .btn-season:active { transform: scale(0.97); }
+  .btn-season:disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
 
-  .btn-season:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-    pointer-events: none;
-  }
-
-  .btn-end {
-    background: linear-gradient(135deg, #dc2626, #b91c1c);
-    border-color: rgba(220,38,38,0.3);
-    box-shadow: 0 4px 16px rgba(220,38,38,0.2);
-  }
-
-  .btn-new {
-    background: linear-gradient(135deg, #16a34a, #15803d);
-    border-color: rgba(22,163,74,0.3);
-    box-shadow: 0 4px 16px rgba(22,163,74,0.2);
-  }
+  .btn-end { background: linear-gradient(135deg, #dc2626, #b91c1c); border-color: rgba(220,38,38,0.3); box-shadow: 0 4px 16px rgba(220,38,38,0.2); }
+  .btn-new { background: linear-gradient(135deg, #16a34a, #15803d); border-color: rgba(22,163,74,0.3); box-shadow: 0 4px 16px rgba(22,163,74,0.2); }
 
   /* ── Summary Grid ── */
   .summary-grid {
@@ -422,7 +416,6 @@
 
   #toast.show { transform: translateX(-50%) translateY(0); }
 
-  /* ── Spinner ── */
   @keyframes spin { to { transform: rotate(360deg); } }
   .spin {
     width: 16px; height: 16px;
@@ -433,7 +426,6 @@
     display: inline-block;
   }
 
-  /* ── Responsive ── */
   @media (max-width: 380px) {
     .season-actions { grid-template-columns: 1fr; }
     .summary-grid   { grid-template-columns: 1fr 1fr; }
@@ -479,6 +471,16 @@
         <div class="s-info-value" id="curSeasonLabel">—</div>
       </div>
       <span class="season-pill pill-active" id="seasonPill">جاري التحميل</span>
+    </div>
+
+    <!-- Current Champion from previous season -->
+    <div class="current-champ-box" id="currentChampBox">
+      <div class="cc-icon">🏆</div>
+      <div>
+        <div class="cc-label">بطل الموسم السابق</div>
+        <div class="cc-name" id="ccName">—</div>
+        <div class="cc-pts" id="ccPts"></div>
+      </div>
     </div>
 
     <!-- Season Actions -->
@@ -592,10 +594,7 @@ const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
 const PASSWORD = "88888888";
 
-/* ─────────────────────────────────────────
-   حماية من التكرار — قفل عمليات الموسم
-───────────────────────────────────────── */
-let seasonOpLock = false; // يمنع الضغط المتكرر على الزر
+let seasonOpLock = false;
 
 /* ─── Toast ─── */
 function toast(msg, dur = 3000) {
@@ -617,9 +616,7 @@ function getLeague(p) {
 function goTo(url) { window.location.href = url; }
 window.goTo = goTo;
 
-/* ─────────────────────────────────────────
-   AUTH
-───────────────────────────────────────── */
+/* ─── AUTH ─── */
 window.login = function () {
   if (document.getElementById("passInput").value === PASSWORD) {
     sessionStorage.setItem("admin_auth", "1");
@@ -639,19 +636,17 @@ window.logout = function () {
 if (sessionStorage.getItem("admin_auth") === "1") initDashboard();
 
 function initDashboard() {
-  document.getElementById("loginBox").style.display   = "none";
-  document.getElementById("dashboard").style.display  = "block";
+  document.getElementById("loginBox").style.display  = "none";
+  document.getElementById("dashboard").style.display = "block";
   attachListeners();
 }
 
-/* ─────────────────────────────────────────
-   REALTIME LISTENERS
-───────────────────────────────────────── */
+/* ─── REALTIME LISTENERS ─── */
 function attachListeners() {
+
   // Listener 1: seasonMeta
   onValue(ref(db, "seasonMeta"), (snap) => {
     const meta  = snap.exists() ? snap.val() : {};
-    // ✅ المصدر الموثوق الوحيد — boolean صريح
     const ended = meta.seasonEnded === true;
     const num   = meta.seasonNumber || 1;
 
@@ -666,7 +661,6 @@ function attachListeners() {
       pill.className   = "season-pill pill-active";
     }
 
-    // ✅ تحكم بالأزرار بناءً على الحالة الحقيقية من Firebase
     document.getElementById("btnEnd").disabled = ended;
     document.getElementById("btnNew").disabled = !ended;
   });
@@ -685,20 +679,19 @@ function attachListeners() {
     let best = "—", bestPts = -Infinity, html = "";
 
     for (let name in data) {
-      const p = data[name];
+      const p   = data[name];
       const pts = p.points || 0;
       if (pts > bestPts) { bestPts = pts; best = name; }
 
-      // escape name for onclick attributes
-      const safeN = name.replace(/'/g, "\\'");
+      // ✅ use data-name attribute instead of inline onclick with escaped strings
       html += `
         <tr>
           <td style="font-weight:700;color:var(--text);max-width:100px;overflow:hidden;text-overflow:ellipsis;">${name}</td>
-          <td><input class="pts-input" id="p_${name}" value="${pts}"></td>
+          <td><input class="pts-input" id="p_pts_${btoa(encodeURIComponent(name))}" value="${pts}"></td>
           <td class="win-val">${p.wins   || 0}</td>
           <td class="loss-val">${p.losses || 0}</td>
-          <td><button class="tbl-btn btn-upd" onclick="updatePlayer('${safeN}')">تحديث</button></td>
-          <td><button class="tbl-btn btn-del" onclick="deletePlayer('${safeN}')">حذف</button></td>
+          <td><button class="tbl-btn btn-upd" data-name="${name}" onclick="updatePlayer(this.dataset.name)">تحديث</button></td>
+          <td><button class="tbl-btn btn-del" data-name="${name}" onclick="deletePlayer(this.dataset.name)">حذف</button></td>
         </tr>`;
     }
 
@@ -712,13 +705,20 @@ function attachListeners() {
     if (!snap.exists()) {
       document.getElementById("seasonsBody").innerHTML =
         `<tr><td colspan="5" style="text-align:center;padding:18px;color:var(--muted);">لا توجد مواسم مكتملة بعد</td></tr>`;
+      document.getElementById("currentChampBox").classList.remove("show");
       return;
     }
 
     const data = snap.val();
     const ids  = Object.keys(data).sort((a, b) => (data[b].seasonNumber||0) - (data[a].seasonNumber||0));
-    let html = "";
 
+    // Show last season champion
+    const latest = data[ids[0]];
+    document.getElementById("ccName").textContent = latest.winner || "—";
+    document.getElementById("ccPts").textContent  = `${latest.winnerPoints || 0} نقطة — الموسم ${latest.seasonNumber || ""}`;
+    document.getElementById("currentChampBox").classList.add("show");
+
+    let html = "";
     for (let id of ids) {
       const s = data[id];
       html += `
@@ -727,7 +727,7 @@ function attachListeners() {
           <td style="font-weight:700;color:var(--text);">🏆 ${s.winner}</td>
           <td style="color:var(--gold);font-weight:700;">${s.winnerPoints}</td>
           <td style="font-size:11px;color:var(--muted);">${s.endedDate || "—"}</td>
-          <td><button class="tbl-btn btn-view" onclick="showSeason('${id}')">عرض</button></td>
+          <td><button class="tbl-btn btn-view" data-id="${id}" onclick="showSeason(this.dataset.id)">عرض</button></td>
         </tr>`;
     }
 
@@ -735,9 +735,7 @@ function attachListeners() {
   });
 }
 
-/* ─────────────────────────────────────────
-   ADD PLAYER
-───────────────────────────────────────── */
+/* ─── ADD PLAYER ─── */
 window.addPlayer = async function () {
   const name = document.getElementById("newPlayerName").value.trim();
   if (!name) return;
@@ -752,39 +750,31 @@ window.addPlayer = async function () {
   toast(`✅ تمت إضافة اللاعب "${name}"`);
 };
 
-/* ─────────────────────────────────────────
-   UPDATE PLAYER
-───────────────────────────────────────── */
+/* ─── UPDATE PLAYER ─── */
 window.updatePlayer = async function (name) {
-  const inp = document.getElementById("p_" + name);
+  // ✅ استخدام btoa/encodeURIComponent بدل CSS.escape للـ input id
+  const inputId = `p_pts_${btoa(encodeURIComponent(name))}`;
+  const inp = document.getElementById(inputId);
   if (!inp) return;
   const val = Math.max(0, parseInt(inp.value) || 0);
   await update(ref(db, `players/${name}`), { points: val, league: getLeague(val) });
   toast(`✅ تم تحديث نقاط "${name}" → ${val}`);
 };
 
-/* ─────────────────────────────────────────
-   DELETE PLAYER
-───────────────────────────────────────── */
+/* ─── DELETE PLAYER ─── */
 window.deletePlayer = async function (name) {
   if (!confirm(`حذف اللاعب "${name}"؟`)) return;
   await remove(ref(db, `players/${name}`));
   toast(`🗑️ تم حذف "${name}"`);
 };
 
-/* ─────────────────────────────────────────
-   END SEASON
-   ✅ حماية من التكرار بـ seasonOpLock
-   ✅ تحقق مزدوج من seasonEnded قبل التنفيذ
-───────────────────────────────────────── */
+/* ─── END SEASON ─── */
 window.endSeason = async function () {
-  // حماية الطبقة الأولى: قفل في الذاكرة
   if (seasonOpLock) { toast("⏳ العملية جارية..."); return; }
 
   const metaSnap = await get(ref(db, "seasonMeta"));
   const meta     = metaSnap.exists() ? metaSnap.val() : {};
 
-  // حماية الطبقة الثانية: قراءة من Firebase
   if (meta.seasonEnded === true) {
     toast("⚠️ الموسم منتهٍ مسبقاً");
     return;
@@ -804,7 +794,6 @@ window.endSeason = async function () {
     return;
   }
 
-  // ── تفعيل القفل ──
   seasonOpLock = true;
   document.getElementById("btnEnd").disabled = true;
   document.getElementById("btnEnd").innerHTML = `<div class="spin"></div> جاري...`;
@@ -814,7 +803,6 @@ window.endSeason = async function () {
     const seasonId     = `season_${seasonNumber}`;
     const now          = new Date();
 
-    // أرشفة أفضل 10
     const top10 = list.slice(0, 10).map(p => ({
       name:   p.name,
       points: p.points || 0,
@@ -833,7 +821,6 @@ window.endSeason = async function () {
       endedDate: now.toLocaleDateString("ar-IQ")
     });
 
-    // توزيع النقاط
     const n = list.length;
     list[0].points = (list[0].points || 0) + 20;
     list[1].points = (list[1].points || 0) + 10;
@@ -846,7 +833,6 @@ window.endSeason = async function () {
       updates[`players/${p.name}/league`] = getLeague(p.points);
     }
 
-    // ✅ كل شيء في عملية واحدة atomically
     updates["seasonMeta/seasonEnded"]  = true;
     updates["seasonMeta/seasonNumber"] = seasonNumber;
     updates["seasonMeta/lastEndDate"]  = now.toISOString();
@@ -863,18 +849,13 @@ window.endSeason = async function () {
   }
 };
 
-/* ─────────────────────────────────────────
-   NEW SEASON
-   ✅ يعيد فقط seasonEnded = false
-   ✅ لا يمس اللاعبين أو المواسم القديمة
-───────────────────────────────────────── */
+/* ─── NEW SEASON ─── */
 window.newSeason = async function () {
   if (seasonOpLock) { toast("⏳ العملية جارية..."); return; }
 
   const metaSnap = await get(ref(db, "seasonMeta"));
   const meta     = metaSnap.exists() ? metaSnap.val() : {};
 
-  // تحقق مزدوج من Firebase
   if (meta.seasonEnded !== true) {
     toast("⚠️ الموسم الحالي لم ينتهِ بعد");
     return;
@@ -887,7 +868,6 @@ window.newSeason = async function () {
   document.getElementById("btnNew").innerHTML = `<div class="spin"></div> جاري...`;
 
   try {
-    // ✅ نعيد فقط seasonEnded إلى false — لا شيء آخر
     await update(ref(db, "seasonMeta"), {
       seasonEnded: false,
       startedAt:   new Date().toISOString()
@@ -902,9 +882,7 @@ window.newSeason = async function () {
   }
 };
 
-/* ─────────────────────────────────────────
-   SHOW SEASON DETAILS
-───────────────────────────────────────── */
+/* ─── SHOW SEASON DETAILS ─── */
 window.showSeason = async function (id) {
   const snap = await get(ref(db, `seasons/${id}`));
   if (!snap.exists()) return;
