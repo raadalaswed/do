@@ -849,7 +849,22 @@ window.endSeason = async function () {
   }
 };
 
-/* ─── NEW SEASON ─── */
+/* ─────────────────────────────────────────
+   NEW SEASON — Soft Reset
+   ✅ المعادلة: نقاط جديدة = floor(نقاط قديمة × 0.30) + 50
+   
+   المنطق:
+   - الاحتفاظ بـ 30% فقط من النقاط (يقلص الفجوات بشكل كبير)
+   - إضافة 50 نقطة أساسية للجميع (لا أحد يبدأ من الصفر)
+   
+   مثال عملي:
+     300 نقطة → 90  + 50 = 140
+     150 نقطة → 45  + 50 = 95
+      60 نقطة → 18  + 50 = 68
+      10 نقطة → 3   + 50 = 53
+   
+   الفجوة بين الأول والأخير تنضغط من 290 إلى 87 نقطة ✅
+───────────────────────────────────────── */
 window.newSeason = async function () {
   if (seasonOpLock) { toast("⏳ العملية جارية..."); return; }
 
@@ -861,18 +876,57 @@ window.newSeason = async function () {
     return;
   }
 
-  if (!confirm("بدء موسم جديد؟ سيُفعَّل الدوري مجدداً.")) return;
+  // اقرأ اللاعبين الحاليين لعرض معاينة للأدمن
+  const playersSnap = await get(ref(db, "players"));
+  if (!playersSnap.exists()) {
+    toast("⚠️ لا يوجد لاعبون");
+    return;
+  }
+
+  const playersData = playersSnap.val();
+  const playerList  = Object.entries(playersData)
+    .map(([name, p]) => ({ name, pts: p.points || 0 }))
+    .sort((a, b) => b.pts - a.pts);
+
+  // بناء نص المعاينة لأعلى 5 لاعبين
+  const preview = playerList.slice(0, 5)
+    .map(p => {
+      const newPts = Math.floor(p.pts * 0.30) + 50;
+      return `${p.name}: ${p.pts} ← ${newPts}`;
+    }).join("\n");
+
+  const confirmMsg =
+    `🔄 بدء موسم جديد؟\n\n` +
+    `سيتم تطبيق Soft Reset على نقاط جميع اللاعبين:\n` +
+    `المعادلة: نقاط جديدة = (النقاط × 30%) + 50\n\n` +
+    `معاينة أعلى اللاعبين:\n${preview}\n\n` +
+    `هل تريد المتابعة؟`;
+
+  if (!confirm(confirmMsg)) return;
 
   seasonOpLock = true;
   document.getElementById("btnNew").disabled = true;
   document.getElementById("btnNew").innerHTML = `<div class="spin"></div> جاري...`;
 
   try {
-    await update(ref(db, "seasonMeta"), {
-      seasonEnded: false,
-      startedAt:   new Date().toISOString()
-    });
-    toast("🚀 تم بدء موسم جديد بنجاح!");
+    const updates = {};
+
+    // ✅ طبّق Soft Reset على كل لاعب
+    for (let [name, p] of Object.entries(playersData)) {
+      const oldPts = p.points || 0;
+      const newPts = Math.floor(oldPts * 0.30) + 50;
+      updates[`players/${name}/points`] = newPts;
+      updates[`players/${name}/league`] = getLeague(newPts);
+      // ✅ احتفظ بالفوز/الخسارة/الـ streak كما هي — لا تمسّها
+    }
+
+    // ✅ فعّل الموسم الجديد
+    updates["seasonMeta/seasonEnded"] = false;
+    updates["seasonMeta/startedAt"]   = new Date().toISOString();
+
+    await update(ref(db), updates);
+
+    toast(`🚀 بدأ الموسم الجديد! تم تطبيق Soft Reset على ${playerList.length} لاعب`, 4000);
   } catch (err) {
     console.error("newSeason error:", err);
     toast("❌ حدث خطأ أثناء بدء الموسم");
