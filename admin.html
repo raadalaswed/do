@@ -14,7 +14,7 @@
     min-height: 100vh;
   }
 
-  /* ── شاشة تسجيل الدخول ── */
+  /* ── شاشة الدخول ── */
   .login-screen {
     min-height: 100vh;
     display: flex;
@@ -43,14 +43,8 @@
     border: 1px solid rgba(245,158,11,0.3);
   }
 
-  .login-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: #f1f5f9;
-    margin-bottom: 6px;
-  }
-
-  .login-sub { font-size: 13px; color: #475569; margin-bottom: 1.5rem; }
+  .login-title { font-size: 20px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
+  .login-sub   { font-size: 13px; color: #475569; margin-bottom: 1.5rem; }
 
   .pass-wrap {
     background: #0f172a;
@@ -92,7 +86,6 @@
   }
 
   .btn-login:hover { opacity: 0.9; }
-  .btn-login:active { transform: scale(0.98); }
 
   /* ── الداشبورد ── */
   #dashboard { display: none; }
@@ -123,8 +116,44 @@
 
   .btn-logout:hover { background: rgba(239,68,68,0.25); }
 
-  /* ── الصفحة ── */
   .page { max-width: 680px; margin: auto; padding: 1.2rem 1rem 3rem; }
+
+  /* ── Season Status Box ── */
+  .season-status {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 14px 18px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .season-info { display: flex; flex-direction: column; gap: 3px; }
+  .season-info .label { font-size: 11px; color: #64748b; }
+  .season-info .value { font-size: 16px; font-weight: 700; color: #f1f5f9; }
+
+  .season-pill {
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .season-pill.active {
+    background: rgba(34,197,94,0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34,197,94,0.3);
+  }
+
+  .season-pill.ended {
+    background: rgba(239,68,68,0.15);
+    color: #fca5a5;
+    border: 1px solid rgba(239,68,68,0.3);
+  }
 
   /* ── إجراءات الموسم ── */
   .season-actions {
@@ -150,10 +179,11 @@
   }
 
   .btn-season:active { transform: scale(0.97); }
+  .btn-season:disabled { opacity: 0.4; cursor: not-allowed; }
   .btn-end   { background: linear-gradient(135deg, #dc2626, #b91c1c); }
-  .btn-new   { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+  .btn-new   { background: linear-gradient(135deg, #16a34a, #15803d); }
 
-  /* ── كروت الملخص ── */
+  /* ── ملخص ── */
   .summary-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -181,11 +211,12 @@
 
   .sum-icon.blue   { background: rgba(59,130,246,0.15); }
   .sum-icon.yellow { background: rgba(234,179,8,0.15); }
+  .sum-icon.green  { background: rgba(34,197,94,0.15); }
 
-  .sum-val  { font-size: 22px; font-weight: 700; color: #f1f5f9; line-height: 1; margin-bottom: 3px; }
-  .sum-lbl  { font-size: 11px; color: #64748b; }
+  .sum-val { font-size: 22px; font-weight: 700; color: #f1f5f9; line-height: 1; margin-bottom: 3px; }
+  .sum-lbl { font-size: 11px; color: #64748b; }
 
-  /* ── كروت عامة ── */
+  /* ── كروت ── */
   .card {
     background: #1e293b;
     border: 1px solid #334155;
@@ -204,14 +235,10 @@
   }
 
   .card-header-title { font-size: 14px; font-weight: 600; color: #94a3b8; }
-
   .card-body { padding: 1rem 1.1rem; }
 
   /* ── إضافة لاعب ── */
-  .add-row {
-    display: flex;
-    gap: 8px;
-  }
+  .add-row { display: flex; gap: 8px; }
 
   .add-row input {
     flex: 1;
@@ -238,16 +265,11 @@
     font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
-    transition: opacity 0.2s;
   }
 
-  .btn-add:hover { opacity: 0.9; }
-
-  /* ── الجداول ── */
+  /* ── جداول ── */
   .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-
   table { width: 100%; border-collapse: collapse; min-width: 320px; }
-
   thead tr { background: #0f172a; }
 
   th {
@@ -270,7 +292,6 @@
   tbody tr:last-child td { border-bottom: none; }
   tbody tr:hover td { background: rgba(255,255,255,0.02); }
 
-  /* حقل تعديل النقاط */
   .pts-input {
     background: #0f172a;
     border: 1px solid #334155;
@@ -285,7 +306,6 @@
 
   .pts-input:focus { border-color: #3b82f6; }
 
-  /* أزرار الجدول */
   .tbl-btn {
     padding: 5px 12px;
     border: none;
@@ -297,12 +317,11 @@
     white-space: nowrap;
   }
 
-  .tbl-btn:hover { opacity: 0.85; }
-  .tbl-btn.upd { background: rgba(59,130,246,0.2);  color: #93c5fd; border: 1px solid rgba(59,130,246,0.3); }
-  .tbl-btn.del { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.25); }
-  .tbl-btn.view{ background: rgba(99,102,241,0.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.25); }
+  .tbl-btn:hover  { opacity: 0.85; }
+  .tbl-btn.upd  { background: rgba(59,130,246,0.2);  color: #93c5fd; border: 1px solid rgba(59,130,246,0.3); }
+  .tbl-btn.del  { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.25); }
+  .tbl-btn.view { background: rgba(99,102,241,0.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.25); }
 
-  /* شارة الدوري */
   .league-pill {
     display: inline-block;
     padding: 2px 10px;
@@ -314,14 +333,34 @@
     border: 1px solid rgba(99,102,241,0.25);
   }
 
-  /* win / loss */
   .win  { color: #22c55e; font-weight: 600; }
   .loss { color: #ef4444; font-weight: 600; }
+
+  /* ── toast ── */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #f1f5f9;
+    z-index: 9999;
+    transition: transform 0.3s ease;
+    white-space: nowrap;
+  }
+
+  #toast.show { transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
 
-<!-- ── شاشة الدخول ── -->
+<div id="toast"></div>
+
+<!-- شاشة الدخول -->
 <div class="login-screen" id="loginBox">
   <div class="login-box">
     <div class="login-icon">🔐</div>
@@ -335,7 +374,7 @@
   </div>
 </div>
 
-<!-- ── الداشبورد ── -->
+<!-- الداشبورد -->
 <div id="dashboard">
 
   <div class="header">
@@ -346,10 +385,23 @@
 
   <div class="page">
 
+    <!-- حالة الموسم الحالي -->
+    <div class="season-status" id="seasonStatusBox">
+      <div class="season-info">
+        <span class="label">الموسم الحالي</span>
+        <span class="value" id="currentSeasonLabel">—</span>
+      </div>
+      <span class="season-pill" id="seasonPill">جاري التحميل</span>
+    </div>
+
     <!-- إجراءات الموسم -->
     <div class="season-actions">
-      <button class="btn-season btn-end" onclick="endSeason()">🏁 إنهاء الموسم</button>
-      <button class="btn-season btn-new" onclick="newSeason()">🔄 موسم جديد</button>
+      <button class="btn-season btn-end" id="btnEndSeason" onclick="endSeason()">
+        🏁 إنهاء الموسم
+      </button>
+      <button class="btn-season btn-new" id="btnNewSeason" onclick="newSeason()">
+        🔄 بدء موسم جديد
+      </button>
     </div>
 
     <!-- ملخص -->
@@ -365,7 +417,7 @@
         <div class="sum-icon yellow">🏆</div>
         <div>
           <div class="sum-val" id="bestPlayer" style="font-size:16px;">-</div>
-          <div class="sum-lbl">المتصدر</div>
+          <div class="sum-lbl">المتصدر حالياً</div>
         </div>
       </div>
     </div>
@@ -384,7 +436,7 @@
       </div>
     </div>
 
-    <!-- جدول اللاعبين -->
+    <!-- إدارة اللاعبين -->
     <div class="card">
       <div class="card-header">
         <span>👥</span>
@@ -396,6 +448,8 @@
             <tr>
               <th>الاسم</th>
               <th>النقاط</th>
+              <th>فوز</th>
+              <th>خسارة</th>
               <th>تحديث</th>
               <th>حذف</th>
             </tr>
@@ -405,7 +459,7 @@
       </div>
     </div>
 
-    <!-- المواسم -->
+    <!-- سجل المواسم -->
     <div class="card">
       <div class="card-header">
         <span>📦</span>
@@ -416,8 +470,9 @@
           <thead>
             <tr>
               <th>الموسم</th>
-              <th>الأول</th>
+              <th>البطل</th>
               <th>النقاط</th>
+              <th>التاريخ</th>
               <th>تفاصيل</th>
             </tr>
           </thead>
@@ -426,11 +481,11 @@
       </div>
     </div>
 
-    <!-- تفاصيل الموسم -->
-    <div class="card">
+    <!-- تفاصيل الموسم المختار -->
+    <div class="card" id="seasonDetailsCard" style="display:none;">
       <div class="card-header">
         <span>🔍</span>
-        <span class="card-header-title">تفاصيل الموسم المختار</span>
+        <span class="card-header-title" id="seasonDetailsTitle">تفاصيل الموسم</span>
       </div>
       <div class="table-wrap">
         <table>
@@ -454,7 +509,9 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getDatabase, ref, get, set, update, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+import {
+  getDatabase, ref, get, set, update, remove
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC7EVNCSl48CQgIC_a8wdC5UG2tKLtNKjQ",
@@ -464,20 +521,34 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const db  = getDatabase(app);
 const PASSWORD = "88888888";
 
-window.login = function() {
+/* ─────────────────────────────────────────
+   Toast
+───────────────────────────────────────── */
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 3000);
+}
+
+/* ─────────────────────────────────────────
+   Auth
+───────────────────────────────────────── */
+window.login = function () {
   if (document.getElementById("pass").value === PASSWORD) {
-    localStorage.setItem("admin","1");
+    localStorage.setItem("admin", "1");
     init();
   } else {
-    document.getElementById("pass").style.borderColor = "#ef4444";
-    setTimeout(() => document.getElementById("pass").style.borderColor = "", 1000);
+    const pw = document.getElementById("pass");
+    pw.style.borderColor = "#ef4444";
+    setTimeout(() => pw.style.borderColor = "", 1000);
   }
 };
 
-window.logout = function() {
+window.logout = function () {
   localStorage.removeItem("admin");
   location.reload();
 };
@@ -490,57 +561,9 @@ function init() {
   loadAll();
 }
 
-async function loadAll() {
-  loadPlayers();
-  loadSeasons();
-}
-
-async function loadPlayers() {
-  const snap = await get(ref(db,"players"));
-  if (!snap.exists()) return;
-
-  let data = snap.val();
-  let html = "";
-  let best = "-", bestP = 0;
-
-  for (let n in data) {
-    let p = data[n];
-    if (p.points > bestP) { bestP = p.points; best = n; }
-
-    html += `
-      <tr>
-        <td style="font-weight:600;color:#f1f5f9;">${n}</td>
-        <td><input class="pts-input" id="p_${n}" value="${p.points}"></td>
-        <td><button class="tbl-btn upd" onclick="updatePlayer('${n}')">تحديث</button></td>
-        <td><button class="tbl-btn del" onclick="deletePlayer('${n}')">حذف</button></td>
-      </tr>`;
-  }
-
-  document.getElementById("playersTable").innerHTML = html;
-  document.getElementById("playersCount").innerText = Object.keys(data).length;
-  document.getElementById("bestPlayer").innerText = best;
-}
-
-window.addPlayer = async function() {
-  let name = document.getElementById("newPlayer").value.trim();
-  if (!name) return;
-  await set(ref(db,"players/"+name), { points:0, wins:0, losses:0, streak:0, league:5 });
-  document.getElementById("newPlayer").value = "";
-  loadAll();
-};
-
-window.updatePlayer = async function(name) {
-  let val = document.getElementById("p_"+name).value;
-  await update(ref(db,"players/"+name), { points: Number(val) });
-  loadAll();
-};
-
-window.deletePlayer = async function(name) {
-  if (!confirm(`حذف اللاعب "${name}"؟`)) return;
-  await remove(ref(db,"players/"+name));
-  loadAll();
-};
-
+/* ─────────────────────────────────────────
+   مساعدات
+───────────────────────────────────────── */
 function getLeague(p) {
   if (p >= 300) return 1;
   if (p >= 200) return 2;
@@ -549,56 +572,218 @@ function getLeague(p) {
   return 5;
 }
 
-window.endSeason = async function() {
-  const snap = await get(ref(db,"players"));
-  if (!snap.exists()) return;
+/* ─────────────────────────────────────────
+   تحميل كل شيء
+───────────────────────────────────────── */
+async function loadAll() {
+  await Promise.all([loadMeta(), loadPlayers(), loadSeasons()]);
+}
 
-  let data = snap.val();
-  let arr = Object.entries(data).map(([n,p]) => ({ name:n, ...p }));
-  arr.sort((a,b) => b.points - a.points);
+/* ─────────────────────────────────────────
+   seasonMeta
+───────────────────────────────────────── */
+async function loadMeta() {
+  const snap = await get(ref(db, "seasonMeta"));
+  const meta = snap.exists() ? snap.val() : {};
 
-  for (let p of arr) {
-    await update(ref(db,"players/"+p.name), { league: getLeague(p.points) });
+  const num     = meta.seasonNumber || 1;
+  const ended   = meta.seasonEnded  === true;
+
+  document.getElementById("currentSeasonLabel").textContent = `الموسم ${num}`;
+
+  const pill = document.getElementById("seasonPill");
+  if (ended) {
+    pill.textContent = "منتهي ⛔";
+    pill.className   = "season-pill ended";
+  } else {
+    pill.textContent = "نشط ✅";
+    pill.className   = "season-pill active";
   }
 
-  let top10 = arr.slice(0,10).map(p => ({
-    name: p.name,
-    points: p.points,
-    league: getLeague(p.points),
-    wins: p.wins || 0,
-    losses: p.losses || 0
-  }));
+  // تفعيل/تعطيل الأزرار بحسب الحالة
+  document.getElementById("btnEndSeason").disabled = ended;
+  document.getElementById("btnNewSeason").disabled = !ended;
+}
 
-  let seasonId = "Season_" + Date.now();
-  await set(ref(db,"seasons/"+seasonId), {
-    bestPlayer: arr[0].name,
-    bestPoints: arr[0].points,
-    top10,
-    date: new Date().toLocaleDateString()
+/* ─────────────────────────────────────────
+   اللاعبون
+───────────────────────────────────────── */
+async function loadPlayers() {
+  const snap = await get(ref(db, "players"));
+  if (!snap.exists()) return;
+
+  const data = snap.val();
+  let html = "", best = "-", bestPts = -Infinity;
+
+  for (let name in data) {
+    const p = data[name];
+    if ((p.points || 0) > bestPts) { bestPts = p.points; best = name; }
+
+    html += `
+      <tr>
+        <td style="font-weight:600;color:#f1f5f9;">${name}</td>
+        <td><input class="pts-input" id="p_${name}" value="${p.points || 0}"></td>
+        <td class="win">${p.wins   || 0}</td>
+        <td class="loss">${p.losses || 0}</td>
+        <td><button class="tbl-btn upd" onclick="updatePlayer('${name}')">تحديث</button></td>
+        <td><button class="tbl-btn del" onclick="deletePlayer('${name}')">حذف</button></td>
+      </tr>`;
+  }
+
+  document.getElementById("playersTable").innerHTML = html;
+  document.getElementById("playersCount").textContent = Object.keys(data).length;
+  document.getElementById("bestPlayer").textContent   = best;
+}
+
+window.addPlayer = async function () {
+  const name = document.getElementById("newPlayer").value.trim();
+  if (!name) return;
+  await set(ref(db, "players/" + name), {
+    points: 0, wins: 0, losses: 0, streak: 0, league: 5
   });
-
-  alert("تم إنهاء الموسم 🔥");
+  document.getElementById("newPlayer").value = "";
+  showToast(`✅ تمت إضافة اللاعب "${name}"`);
   loadAll();
 };
 
-window.newSeason = function() {
-  alert("تم بدء موسم جديد");
+window.updatePlayer = async function (name) {
+  const val = parseInt(document.getElementById("p_" + name).value) || 0;
+  await update(ref(db, "players/" + name), {
+    points: val,
+    league: getLeague(val)
+  });
+  showToast(`✅ تم تحديث نقاط "${name}"`);
+  loadAll();
 };
 
+window.deletePlayer = async function (name) {
+  if (!confirm(`حذف اللاعب "${name}"؟`)) return;
+  await remove(ref(db, "players/" + name));
+  showToast(`🗑️ تم حذف "${name}"`);
+  loadAll();
+};
+
+/* ─────────────────────────────────────────
+   إنهاء الموسم (يدوي من الأدمن)
+   ✅ لا علاقة له بـ checkSeasonEnd في index.html
+───────────────────────────────────────── */
+window.endSeason = async function () {
+  // تحقق من الحالة أولاً
+  const metaSnap = await get(ref(db, "seasonMeta"));
+  const meta     = metaSnap.exists() ? metaSnap.val() : {};
+
+  if (meta.seasonEnded === true) {
+    showToast("⚠️ الموسم منتهٍ مسبقاً");
+    return;
+  }
+
+  if (!confirm("هل أنت متأكد من إنهاء الموسم؟ سيتم توزيع النقاط وأرشفة النتائج.")) return;
+
+  const playersSnap = await get(ref(db, "players"));
+  if (!playersSnap.exists()) { showToast("لا يوجد لاعبون"); return; }
+
+  let list = Object.entries(playersSnap.val())
+    .map(([n, p]) => ({ name: n, ...p }))
+    .sort((a, b) => b.points - a.points);
+
+  if (list.length < 4) { showToast("⚠️ يجب أن يكون هناك 4 لاعبين على الأقل"); return; }
+
+  const seasonNumber = (meta.seasonNumber || 0) + 1;
+  const seasonId     = `season_${seasonNumber}`;
+
+  // أرشفة أفضل 10 لاعبين
+  const top10 = list.slice(0, 10).map(p => ({
+    name:   p.name,
+    points: p.points,
+    league: getLeague(p.points),
+    wins:   p.wins   || 0,
+    losses: p.losses || 0,
+    streak: p.streak || 0
+  }));
+
+  await set(ref(db, `seasons/${seasonId}`), {
+    seasonNumber,
+    winner:       list[0].name,
+    winnerPoints: list[0].points,
+    top10,
+    endedAt:   new Date().toISOString(),
+    endedDate: new Date().toLocaleDateString("ar-IQ")
+  });
+
+  // توزيع النقاط
+  list[0].points += 20;
+  list[1].points += 10;
+  list[list.length - 2].points = Math.max(0, list[list.length - 2].points - 10);
+  list[list.length - 1].points = Math.max(0, list[list.length - 1].points - 20);
+
+  // تحديث جماعي
+  const updates = {};
+  for (let p of list) {
+    updates[`players/${p.name}/points`] = p.points;
+    updates[`players/${p.name}/league`] = getLeague(p.points);
+  }
+  updates["seasonMeta/seasonEnded"]  = true;
+  updates["seasonMeta/seasonNumber"] = seasonNumber;
+  updates["seasonMeta/lastEndDate"]  = new Date().toISOString();
+
+  await update(ref(db), updates);
+
+  showToast(`🏆 انتهى الموسم ${seasonNumber}! البطل: ${list[0].name}`);
+  loadAll();
+};
+
+/* ─────────────────────────────────────────
+   بدء موسم جديد
+   ✅ يعيد seasonEnded = false
+   ✅ لا يمسح اللاعبين أو المواسم القديمة
+───────────────────────────────────────── */
+window.newSeason = async function () {
+  const metaSnap = await get(ref(db, "seasonMeta"));
+  const meta     = metaSnap.exists() ? metaSnap.val() : {};
+
+  if (meta.seasonEnded !== true) {
+    showToast("⚠️ الموسم الحالي لم ينتهِ بعد");
+    return;
+  }
+
+  if (!confirm("بدء موسم جديد؟ سيُفعَّل الدوري مجدداً ولن تُحذف أي بيانات.")) return;
+
+  await update(ref(db, "seasonMeta"), {
+    seasonEnded: false,
+    startedAt: new Date().toISOString()
+  });
+
+  showToast("🚀 تم بدء موسم جديد!");
+  loadAll();
+};
+
+/* ─────────────────────────────────────────
+   سجل المواسم
+───────────────────────────────────────── */
 async function loadSeasons() {
-  const snap = await get(ref(db,"seasons"));
-  if (!snap.exists()) return;
+  const snap = await get(ref(db, "seasons"));
+  if (!snap.exists()) {
+    document.getElementById("seasonsTable").innerHTML =
+      `<tr><td colspan="5" style="text-align:center;color:#475569;padding:16px;">لا توجد مواسم مكتملة بعد</td></tr>`;
+    return;
+  }
 
-  let data = snap.val();
+  const data = snap.val();
+  const ids  = Object.keys(data).sort((a, b) => {
+    const na = data[a].seasonNumber || 0;
+    const nb = data[b].seasonNumber || 0;
+    return nb - na; // الأحدث أولاً
+  });
+
   let html = "";
-
-  for (let id in data) {
-    let s = data[id];
+  for (let id of ids) {
+    const s = data[id];
     html += `
       <tr>
-        <td style="font-size:11px;color:#64748b;">${id}</td>
-        <td style="font-weight:600;color:#f1f5f9;">${s.bestPlayer}</td>
-        <td style="color:#fbbf24;font-weight:700;">${s.bestPoints}</td>
+        <td style="font-weight:700;color:#fbbf24;">الموسم ${s.seasonNumber || id}</td>
+        <td style="font-weight:600;color:#f1f5f9;">🏆 ${s.winner}</td>
+        <td style="color:#fbbf24;font-weight:700;">${s.winnerPoints}</td>
+        <td style="font-size:11px;color:#64748b;">${s.endedDate || "—"}</td>
         <td><button class="tbl-btn view" onclick="showSeason('${id}')">عرض</button></td>
       </tr>`;
   }
@@ -606,11 +791,11 @@ async function loadSeasons() {
   document.getElementById("seasonsTable").innerHTML = html;
 }
 
-window.showSeason = async function(id) {
-  const snap = await get(ref(db,"seasons/"+id));
+window.showSeason = async function (id) {
+  const snap = await get(ref(db, "seasons/" + id));
   if (!snap.exists()) return;
 
-  let s = snap.val();
+  const s = snap.val();
   let html = "";
 
   s.top10.forEach((p, i) => {
@@ -626,7 +811,12 @@ window.showSeason = async function(id) {
   });
 
   document.getElementById("seasonDetails").innerHTML = html;
-  document.getElementById("seasonDetails").closest(".card").scrollIntoView({ behavior: "smooth" });
+  document.getElementById("seasonDetailsTitle").textContent =
+    `📊 تفاصيل الموسم ${s.seasonNumber} — بطل: ${s.winner}`;
+
+  const card = document.getElementById("seasonDetailsCard");
+  card.style.display = "block";
+  card.scrollIntoView({ behavior: "smooth" });
 };
 </script>
 </body>
