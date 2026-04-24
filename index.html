@@ -2,287 +2,427 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>🏆 دوري الدومينو</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    font-family: Arial, sans-serif;
-    background: #0f172a;
-    color: white;
-    min-height: 100vh;
+  :root {
+    --bg:        #060b18;
+    --surface:   #0d1527;
+    --card:      #111d35;
+    --border:    #1e2f50;
+    --text:      #e8edf5;
+    --muted:     #4a5f82;
+    --gold:      #f5c842;
+    --silver:    #9db4c8;
+    --bronze:    #d07040;
+    --green:     #22c55e;
+    --red:       #ef4444;
+    --blue:      #3b82f6;
+    --purple:    #8b5cf6;
   }
 
+  body {
+    font-family: 'Cairo', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Starfield BG ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59,130,246,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(139,92,246,0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Header ── */
   .header {
-    background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
-    border-bottom: 1px solid #1e293b;
-    padding: 2rem 1rem 1.5rem;
+    position: relative;
+    z-index: 1;
     text-align: center;
+    padding: 2rem 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(6,11,24,0.98) 0%, rgba(13,21,39,0.95) 100%);
+  }
+
+  .header-emblem {
+    font-size: 48px;
+    line-height: 1;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 0 20px rgba(245,200,66,0.4));
   }
 
   .header-title {
-    font-size: clamp(22px, 6vw, 32px);
-    font-weight: 700;
-    color: #f1f5f9;
-    margin-bottom: 6px;
+    font-size: clamp(20px, 5.5vw, 30px);
+    font-weight: 900;
+    color: var(--text);
+    letter-spacing: -0.5px;
   }
 
-  .header-sub { font-size: 13px; color: #475569; }
+  .header-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
 
-  /* ── Season Badge ── */
   .season-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    background: rgba(234,179,8,0.1);
-    border: 1px solid rgba(234,179,8,0.25);
+    gap: 7px;
+    background: rgba(245,200,66,0.08);
+    border: 1px solid rgba(245,200,66,0.2);
     border-radius: 20px;
-    padding: 4px 14px;
+    padding: 5px 16px;
     font-size: 12px;
-    color: #fbbf24;
-    margin-top: 8px;
+    font-weight: 700;
+    color: var(--gold);
+    margin-top: 10px;
+    transition: all 0.3s;
   }
 
-  .season-badge .dot {
-    width: 6px; height: 6px;
-    background: #22c55e;
+  .season-badge.ended {
+    background: rgba(239,68,68,0.08);
+    border-color: rgba(239,68,68,0.2);
+    color: #fca5a5;
+  }
+
+  .pulse-dot {
+    width: 7px; height: 7px;
     border-radius: 50%;
-    animation: pulse 2s infinite;
+    background: var(--green);
+    flex-shrink: 0;
   }
 
-  @keyframes pulse {
-    0%,100% { opacity:1; transform:scale(1); }
-    50%      { opacity:0.4; transform:scale(1.3); }
+  .pulse-dot.live { animation: pulseAnim 2s infinite; }
+  .pulse-dot.dead { background: #ef4444; animation: none; }
+
+  @keyframes pulseAnim {
+    0%,100% { opacity:1; transform:scale(1); box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
+    50%      { opacity:.6; transform:scale(1.3); box-shadow: 0 0 0 4px rgba(34,197,94,0); }
   }
 
+  /* ── Action Buttons ── */
   .actions {
+    position: relative;
+    z-index: 1;
     display: flex;
-    gap: 10px;
-    padding: 1.2rem 1rem;
-    max-width: 600px;
+    gap: 8px;
+    padding: 1rem;
+    max-width: 640px;
     margin: auto;
   }
 
   .btn {
     flex: 1;
-    padding: 13px 8px;
+    padding: 12px 6px 10px;
     border: none;
-    border-radius: 12px;
+    border-radius: 14px;
     cursor: pointer;
     color: white;
-    font-size: clamp(12px, 3.5vw, 14px);
-    font-weight: 600;
+    font-family: 'Cairo', Arial, sans-serif;
+    font-size: clamp(11px, 3vw, 13px);
+    font-weight: 700;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
-    transition: transform 0.15s, opacity 0.15s;
+    gap: 4px;
+    transition: transform 0.15s, box-shadow 0.15s;
+    border: 1px solid transparent;
   }
 
-  .btn:active { transform: scale(0.96); opacity: 0.85; }
+  .btn:active { transform: scale(0.95); }
   .btn-icon { font-size: 20px; }
-  .btn-green  { background: linear-gradient(135deg, #16a34a, #15803d); }
-  .btn-blue   { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
-  .btn-amber  { background: linear-gradient(135deg, #d97706, #b45309); }
 
-  .page { max-width: 600px; margin: auto; padding: 0 1rem 3rem; }
-
-  .section-title {
-    font-size: 13px;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin: 1.2rem 0 8px;
+  .btn-green  {
+    background: linear-gradient(135deg, #16a34a, #15803d);
+    border-color: rgba(34,197,94,0.3);
+    box-shadow: 0 4px 16px rgba(22,163,74,0.25);
+  }
+  .btn-blue   {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    border-color: rgba(59,130,246,0.3);
+    box-shadow: 0 4px 16px rgba(37,99,235,0.25);
+  }
+  .btn-amber  {
+    background: linear-gradient(135deg, #d97706, #b45309);
+    border-color: rgba(217,119,6,0.3);
+    box-shadow: 0 4px 16px rgba(217,119,6,0.25);
+  }
+  .btn-purple {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    border-color: rgba(124,58,237,0.3);
+    box-shadow: 0 4px 16px rgba(124,58,237,0.25);
   }
 
-  .leagues-grid {
+  /* ── Page body ── */
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 640px;
+    margin: auto;
+    padding: 0 0.8rem 4rem;
+  }
+
+  /* ── Ended Banner ── */
+  .ended-banner {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    background: rgba(239,68,68,0.08);
+    border: 1px solid rgba(239,68,68,0.2);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: #fca5a5;
+    font-weight: 600;
+  }
+
+  .ended-banner.show { display: flex; }
+
+  /* ── League Tiers ── */
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 1rem 0 8px 4px;
+  }
+
+  .tiers {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    margin-bottom: 1.5rem;
+    gap: 6px;
+    margin-bottom: 1rem;
   }
 
-  .league-card {
-    background: #1e293b;
-    border: 1px solid #334155;
+  .tier {
+    background: var(--card);
+    border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 10px 6px;
+    padding: 10px 4px;
     text-align: center;
   }
 
-  .league-card .l-icon { font-size: 18px; margin-bottom: 4px; }
-  .league-card .l-num  { font-size: 12px; font-weight: 700; color: #f1f5f9; margin-bottom: 2px; }
-  .league-card .l-pts  { font-size: 10px; color: #64748b; line-height: 1.3; }
+  .tier-icon { font-size: 16px; }
+  .tier-name { font-size: 10px; font-weight: 700; color: var(--text); margin: 3px 0 2px; }
+  .tier-pts  { font-size: 9px; color: var(--muted); line-height: 1.4; }
 
+  /* ── Table Card ── */
   .table-card {
-    background: #1e293b;
-    border: 1px solid #334155;
+    background: var(--card);
+    border: 1px solid var(--border);
     border-radius: 16px;
     overflow: hidden;
   }
 
-  .table-header {
-    background: #020617;
-    padding: 12px 16px;
+  .table-hdr {
+    background: var(--surface);
+    padding: 11px 16px;
     display: flex;
     align-items: center;
     gap: 8px;
-    border-bottom: 1px solid #334155;
+    border-bottom: 1px solid var(--border);
   }
 
-  .table-header-title { font-size: 14px; font-weight: 600; color: #94a3b8; }
+  .table-hdr-title { font-size: 13px; font-weight: 700; color: var(--silver); flex: 1; }
 
-  .live-dot {
-    width: 7px; height: 7px;
-    background: #22c55e;
+  .live-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    color: var(--green);
+  }
+
+  .live-dot2 {
+    width: 6px; height: 6px;
     border-radius: 50%;
-    margin-right: auto;
-    animation: pulse 2s infinite;
+    background: var(--green);
+    animation: pulseAnim 2s infinite;
   }
 
   .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
-  table { width: 100%; border-collapse: collapse; min-width: 340px; }
-  thead tr { background: #0f172a; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 360px;
+  }
+
+  thead tr { background: rgba(6,11,24,0.8); }
 
   th {
-    padding: 10px 12px;
-    font-size: 11px;
-    color: #475569;
-    font-weight: 500;
+    padding: 9px 10px;
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 700;
     text-align: right;
     white-space: nowrap;
-    border-bottom: 1px solid #334155;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: 0.5px;
   }
 
   td {
-    padding: 11px 12px;
+    padding: 11px 10px;
     font-size: 13px;
-    border-bottom: 1px solid #1a2640;
-    color: #cbd5e1;
+    border-bottom: 1px solid rgba(30,47,80,0.5);
+    color: #c8d4e8;
     white-space: nowrap;
   }
 
   tbody tr:last-child td { border-bottom: none; }
-  tbody tr { transition: background 0.15s; }
-  tbody tr:hover td { background: rgba(255,255,255,0.03); }
 
-  .row-top td { background: rgba(5,150,105,0.12); }
-  .row-top:hover td { background: rgba(5,150,105,0.18) !important; }
-  .row-bottom td { background: rgba(127,29,29,0.15); }
-  .row-bottom:hover td { background: rgba(127,29,29,0.22) !important; }
+  tbody tr {
+    transition: background 0.15s;
+    cursor: default;
+  }
 
-  .rank-badge {
+  tbody tr:hover td { background: rgba(59,130,246,0.04); }
+
+  .row-top td     { background: rgba(34,197,94,0.06); }
+  .row-top:hover td { background: rgba(34,197,94,0.1) !important; }
+  .row-bot td     { background: rgba(239,68,68,0.06); }
+  .row-bot:hover td { background: rgba(239,68,68,0.1) !important; }
+
+  /* ── Rank Badges ── */
+  .rank {
     width: 28px; height: 28px;
     border-radius: 8px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 11px;
+    font-weight: 800;
   }
 
-  .rank-1 { background: rgba(234,179,8,0.2);  color: #fbbf24; }
-  .rank-2 { background: rgba(148,163,184,0.2); color: #94a3b8; }
-  .rank-3 { background: rgba(180,83,9,0.2);    color: #f97316; }
-  .rank-n { background: rgba(51,65,85,0.5);    color: #64748b; }
+  .r1 { background: rgba(245,200,66,0.18); color: var(--gold);   }
+  .r2 { background: rgba(157,180,200,0.18); color: var(--silver); }
+  .r3 { background: rgba(208,112,64,0.18);  color: var(--bronze); }
+  .rn { background: rgba(74,95,130,0.25);   color: var(--muted);  font-size:12px; }
 
-  a { color: #f1f5f9; text-decoration: none; font-weight: 600; font-size: 14px; }
-  a:hover { color: #60a5fa; }
+  /* ── Player Link ── */
+  .player-link {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 13px;
+    transition: color 0.15s;
+  }
 
-  .win    { color: #22c55e; font-weight: 600; }
-  .loss   { color: #ef4444; font-weight: 600; }
-  .streak { color: #f97316; font-weight: 600; }
+  .player-link:hover { color: #60a5fa; }
+
+  /* ── Stats ── */
+  .pts-val  { font-weight: 800; color: var(--text); font-size: 14px; }
+  .win-val  { color: var(--green); font-weight: 700; }
+  .loss-val { color: var(--red);   font-weight: 700; }
+  .str-val  { color: #f97316; font-weight: 700; }
 
   .league-pill {
     display: inline-block;
-    padding: 2px 10px;
+    padding: 2px 8px;
     border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-    background: rgba(99,102,241,0.15);
+    font-size: 10px;
+    font-weight: 700;
+    background: rgba(99,102,241,0.12);
     color: #a5b4fc;
-    border: 1px solid rgba(99,102,241,0.25);
+    border: 1px solid rgba(99,102,241,0.2);
   }
 
-  /* ── Season Ended Banner ── */
-  .season-ended-banner {
-    background: rgba(234,179,8,0.08);
-    border: 1px solid rgba(234,179,8,0.2);
-    border-radius: 12px;
-    padding: 12px 16px;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  /* ── Loading ── */
+  .loader-row td {
+    text-align: center;
+    padding: 32px;
+    color: var(--muted);
     font-size: 13px;
-    color: #fbbf24;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    width: 22px; height: 22px;
+    border: 2px solid var(--border);
+    border-top-color: var(--blue);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 8px;
+  }
+
+  /* ── Responsive tweaks ── */
+  @media (max-width: 400px) {
+    .actions { gap: 6px; padding: 0.8rem 0.6rem; }
+    .btn { font-size: 10px; padding: 10px 4px 8px; border-radius: 10px; }
+    .btn-icon { font-size: 17px; }
+    .tiers { grid-template-columns: repeat(5, 1fr); gap: 4px; }
+    .tier { padding: 8px 2px; }
+    .tier-icon { font-size: 13px; }
+    .tier-name { font-size: 9px; }
+    .tier-pts  { font-size: 8px; }
   }
 </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <div class="header">
-  <div class="header-title">🏆 دوري الدومينو</div>
+  <div class="header-emblem">🏆</div>
+  <div class="header-title">دوري الدومينو</div>
   <div class="header-sub">جدول الترتيب المباشر</div>
-  <div class="season-badge">
-    <div class="dot"></div>
+  <div class="season-badge" id="seasonBadge">
+    <div class="pulse-dot live" id="pulseDot"></div>
     <span id="seasonLabel">جاري التحميل...</span>
   </div>
 </div>
 
+<!-- ACTION BUTTONS -->
 <div class="actions">
-  <button class="btn btn-green" onclick="goToAddMatch()">
-    <span class="btn-icon">➕</span> إضافة مباراة
+  <button class="btn btn-green" onclick="goTo('add-match.html')">
+    <span class="btn-icon">➕</span>إضافة مباراة
   </button>
-  <button class="btn btn-blue" onclick="goToStats()">
-    <span class="btn-icon">📊</span> الإحصائيات
+  <button class="btn btn-blue" onclick="goTo('stats.html')">
+    <span class="btn-icon">📊</span>الإحصائيات
   </button>
-  <button class="btn btn-amber" onclick="goToAdmin()">
-    <span class="btn-icon">🧑‍💻</span> الإدارة
+  <button class="btn btn-purple" onclick="goTo('tournaments.html')">
+    <span class="btn-icon">🎯</span>البطولات
+  </button>
+  <button class="btn btn-amber" onclick="goTo('admin.html')">
+    <span class="btn-icon">🧑‍💻</span>الإدارة
   </button>
 </div>
 
+<!-- PAGE CONTENT -->
 <div class="page">
 
-  <div id="seasonEndedBanner" style="display:none;" class="season-ended-banner">
+  <!-- Ended Banner -->
+  <div class="ended-banner" id="endedBanner">
     🏁 انتهى الموسم الحالي — انتظر بدء الموسم الجديد من لوحة الإدارة
   </div>
 
-  <div class="section-title">مستويات الدوري</div>
-  <div class="leagues-grid">
-    <div class="league-card">
-      <div class="l-icon">🥇</div>
-      <div class="l-num">الأول</div>
-      <div class="l-pts">300+</div>
-    </div>
-    <div class="league-card">
-      <div class="l-icon">🥈</div>
-      <div class="l-num">الثاني</div>
-      <div class="l-pts">200–299</div>
-    </div>
-    <div class="league-card">
-      <div class="l-icon">🥉</div>
-      <div class="l-num">الثالث</div>
-      <div class="l-pts">120–199</div>
-    </div>
-    <div class="league-card">
-      <div class="l-icon">4️⃣</div>
-      <div class="l-num">الرابع</div>
-      <div class="l-pts">60–119</div>
-    </div>
-    <div class="league-card">
-      <div class="l-icon">5️⃣</div>
-      <div class="l-num">الخامس</div>
-      <div class="l-pts">أقل من 60</div>
-    </div>
+  <!-- Tiers -->
+  <div class="section-label">مستويات الدوري</div>
+  <div class="tiers">
+    <div class="tier"><div class="tier-icon">🥇</div><div class="tier-name">الأول</div><div class="tier-pts">300+</div></div>
+    <div class="tier"><div class="tier-icon">🥈</div><div class="tier-name">الثاني</div><div class="tier-pts">200–299</div></div>
+    <div class="tier"><div class="tier-icon">🥉</div><div class="tier-name">الثالث</div><div class="tier-pts">120–199</div></div>
+    <div class="tier"><div class="tier-icon">4️⃣</div><div class="tier-name">الرابع</div><div class="tier-pts">60–119</div></div>
+    <div class="tier"><div class="tier-icon">5️⃣</div><div class="tier-name">الخامس</div><div class="tier-pts">أقل من 60</div></div>
   </div>
 
+  <!-- Table -->
   <div class="table-card">
-    <div class="table-header">
-      <span class="table-header-title">📊 جدول الترتيب</span>
-      <div class="live-dot" title="يتحدث كل 10 ثوانٍ"></div>
+    <div class="table-hdr">
+      <span class="table-hdr-title">📊 جدول الترتيب</span>
+      <div class="live-indicator">
+        <div class="live-dot2"></div>
+        <span>مباشر</span>
+      </div>
     </div>
     <div class="table-wrap">
       <table>
@@ -297,7 +437,11 @@
             <th>🔥</th>
           </tr>
         </thead>
-        <tbody id="table"></tbody>
+        <tbody id="tableBody">
+          <tr class="loader-row">
+            <td colspan="7"><div class="spinner"></div> جاري التحميل...</td>
+          </tr>
+        </tbody>
       </table>
     </div>
   </div>
@@ -305,176 +449,107 @@
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import {
-  getDatabase, ref, get, set, update
-} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+import { initializeApp }          from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC7EVNCSl48CQgIC_a8wdC5UG2tKLtNKjQ",
-  authDomain: "garag-system.firebaseapp.com",
-  databaseURL: "https://garag-system-default-rtdb.firebaseio.com",
-  projectId: "garag-system",
-  storageBucket: "garag-system.firebasestorage.app",
+  apiKey:            "AIzaSyC7EVNCSl48CQgIC_a8wdC5UG2tKLtNKjQ",
+  authDomain:        "garag-system.firebaseapp.com",
+  databaseURL:       "https://garag-system-default-rtdb.firebaseio.com",
+  projectId:         "garag-system",
+  storageBucket:     "garag-system.firebasestorage.app",
   messagingSenderId: "330947022055",
-  appId: "1:330947022055:web:ce96293502f40d2645a642"
+  appId:             "1:330947022055:web:ce96293502f40d2645a642"
 };
 
 const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
 
-/* ─────────────────────────────────────────
-   مساعدات
-───────────────────────────────────────── */
-function getLeague(points) {
-  if (points >= 300) return 1;
-  if (points >= 200) return 2;
-  if (points >= 120) return 3;
-  if (points >= 60)  return 4;
+/* ─── Helpers ─── */
+function getLeague(p) {
+  if (p >= 300) return 1;
+  if (p >= 200) return 2;
+  if (p >= 120) return 3;
+  if (p >= 60)  return 4;
   return 5;
 }
 
 function rankBadge(i) {
-  if (i === 0) return `<span class="rank-badge rank-1">🥇</span>`;
-  if (i === 1) return `<span class="rank-badge rank-2">🥈</span>`;
-  if (i === 2) return `<span class="rank-badge rank-3">🥉</span>`;
-  return `<span class="rank-badge rank-n">${i + 1}</span>`;
+  if (i === 0) return `<span class="rank r1">🥇</span>`;
+  if (i === 1) return `<span class="rank r2">🥈</span>`;
+  if (i === 2) return `<span class="rank r3">🥉</span>`;
+  return `<span class="rank rn">${i + 1}</span>`;
 }
 
 /* ─────────────────────────────────────────
-   إنهاء الموسم (آمنة من التكرار)
-   ✅ تعمل فقط يوم الجمعة
-   ✅ تتحقق من seasonEnded قبل التنفيذ
-   ✅ تضع seasonEnded=true بعد التنفيذ
+   REALTIME LISTENERS — بدلاً من polling
+   هذا يحل مشكلة التأخر في التحديث
 ───────────────────────────────────────── */
-async function checkSeasonEnd() {
-  // 1) تحقق من اليوم أولاً (الجمعة = 5)
-  const today = new Date();
-  if (today.getDay() !== 5) return;
 
-  // 2) اقرأ حالة الموسم من Firebase
-  const metaSnap = await get(ref(db, "seasonMeta"));
-  const meta     = metaSnap.exists() ? metaSnap.val() : {};
+// Listener 1: seasonMeta (مصدر الحقيقة الوحيد للموسم)
+onValue(ref(db, "seasonMeta"), (snap) => {
+  const meta   = snap.exists() ? snap.val() : {};
+  const num    = meta.seasonNumber || 1;
+  // ✅ قراءة موثوقة: نتأكد أن القيمة boolean true وليس أي قيمة أخرى
+  const ended  = meta.seasonEnded === true;
 
-  // 3) إذا انتهى الموسم مسبقاً → لا تفعل شيئاً
-  if (meta.seasonEnded === true) return;
+  const label  = document.getElementById("seasonLabel");
+  const badge  = document.getElementById("seasonBadge");
+  const dot    = document.getElementById("pulseDot");
+  const banner = document.getElementById("endedBanner");
 
-  // 4) اقرأ اللاعبين
-  const playersSnap = await get(ref(db, "players"));
-  if (!playersSnap.exists()) return;
+  label.textContent = `الموسم ${num} — ${ended ? "منتهٍ" : "جارٍ"}`;
 
-  let list = Object.entries(playersSnap.val())
-    .map(([name, data]) => ({ name, ...data }))
-    .sort((a, b) => b.points - a.points);
-
-  if (list.length < 4) return; // لا يكفي للترتيب
-
-  // 5) أرشفة الموسم أولاً
-  const seasonNumber = (meta.seasonNumber || 0) + 1;
-  const seasonId     = `season_${seasonNumber}`;
-  const top10 = list.slice(0, 10).map(p => ({
-    name:   p.name,
-    points: p.points,
-    league: getLeague(p.points),
-    wins:   p.wins   || 0,
-    losses: p.losses || 0,
-    streak: p.streak || 0
-  }));
-
-  await set(ref(db, `seasons/${seasonId}`), {
-    seasonNumber,
-    winner:      list[0].name,
-    winnerPoints: list[0].points,
-    top10,
-    endedAt: new Date().toISOString(),
-    endedDate: today.toLocaleDateString("ar-IQ")
-  });
-
-  // 6) تحديث نقاط اللاعبين (مرة واحدة فقط)
-  const updates = {};
-  list[0].points += 20;
-  list[1].points += 10;
-  list[list.length - 2].points -= 10;
-  list[list.length - 1].points -= 20;
-
-  for (let p of list) {
-    // لا تسمح بنقاط سالبة
-    p.points = Math.max(0, p.points);
-    updates[`players/${p.name}/points`] = p.points;
-    updates[`players/${p.name}/league`] = getLeague(p.points);
+  if (ended) {
+    badge.classList.add("ended");
+    dot.classList.remove("live");
+    dot.classList.add("dead");
+    banner.classList.add("show");
+  } else {
+    badge.classList.remove("ended");
+    dot.classList.remove("dead");
+    dot.classList.add("live");
+    banner.classList.remove("show");
   }
+});
 
-  // 7) ضع seasonEnded = true في نفس العملية
-  updates["seasonMeta/seasonEnded"]  = true;
-  updates["seasonMeta/seasonNumber"] = seasonNumber;
-  updates["seasonMeta/lastEndDate"]  = today.toISOString();
+// Listener 2: players (تحديث فوري عند أي تغيير)
+onValue(ref(db, "players"), (snap) => {
+  const tbody = document.getElementById("tableBody");
 
-  await update(ref(db), updates);
-
-  console.log(`✅ انتهى الموسم ${seasonNumber} بنجاح`);
-}
-
-/* ─────────────────────────────────────────
-   تحميل اللاعبين وعرضهم
-───────────────────────────────────────── */
-async function loadPlayers() {
-  // تشغيل checkSeasonEnd بشكل منفصل (لا يوقف العرض إذا فشل)
-  checkSeasonEnd().catch(err => console.warn("checkSeasonEnd error:", err));
-
-  // اقرأ seasonMeta لعرض شارة الموسم
-  const metaSnap = await get(ref(db, "seasonMeta"));
-  const meta = metaSnap.exists() ? metaSnap.val() : {};
-
-  const seasonNum = meta.seasonNumber || 1;
-  document.getElementById("seasonLabel").textContent =
-    `الموسم ${seasonNum}${meta.seasonEnded ? " — انتهى" : " — جارٍ"}`;
-
-  // عرض/إخفاء بانر انتهاء الموسم
-  document.getElementById("seasonEndedBanner").style.display =
-    meta.seasonEnded ? "flex" : "none";
-
-  // اقرأ اللاعبين
-  const snapshot = await get(ref(db, "players"));
-  if (!snapshot.exists()) {
-    document.getElementById("table").innerHTML =
-      `<tr><td colspan="7" style="text-align:center;color:#475569;padding:24px;">لا يوجد لاعبين بعد</td></tr>`;
+  if (!snap.exists()) {
+    tbody.innerHTML = `<tr class="loader-row"><td colspan="7">لا يوجد لاعبون بعد</td></tr>`;
     return;
   }
 
-  let list = Object.entries(snapshot.val())
-    .map(([name, data]) => ({ name, ...data }))
-    .sort((a, b) => b.points - a.points);
+  const list = Object.entries(snap.val())
+    .map(([name, d]) => ({ name, ...d }))
+    .sort((a, b) => (b.points || 0) - (a.points || 0));
 
   let html = "";
   list.forEach((p, i) => {
     let rowClass = "";
     if (i === 0) rowClass = "row-top";
-    else if (i >= list.length - 2) rowClass = "row-bottom";
+    else if (i >= list.length - 2 && list.length >= 4) rowClass = "row-bot";
 
     html += `
       <tr class="${rowClass}">
         <td>${rankBadge(i)}</td>
-        <td><a href="player.html?name=${encodeURIComponent(p.name)}">${p.name}</a></td>
-        <td style="font-weight:700;color:#f1f5f9;">${p.points}</td>
-        <td><span class="league-pill">الدوري ${p.league || getLeague(p.points)}</span></td>
-        <td class="win">${p.wins   || 0}</td>
-        <td class="loss">${p.losses || 0}</td>
-        <td class="streak">${p.streak || 0}</td>
+        <td><a class="player-link" href="player.html?name=${encodeURIComponent(p.name)}">${p.name}</a></td>
+        <td class="pts-val">${p.points || 0}</td>
+        <td><span class="league-pill">الدوري ${p.league || getLeague(p.points || 0)}</span></td>
+        <td class="win-val">${p.wins   || 0}</td>
+        <td class="loss-val">${p.losses || 0}</td>
+        <td class="str-val">${p.streak || 0}</td>
       </tr>`;
   });
 
-  document.getElementById("table").innerHTML = html;
-}
-
-// تحميل أولي + تحديث كل 10 ثواني (بدلاً من 5 لتخفيف الطلبات)
-loadPlayers();
-setInterval(loadPlayers, 10000);
+  tbody.innerHTML = html;
+});
 </script>
 
 <script>
-function goToAddMatch() { window.location.href = "add-match.html"; }
-function goToStats()    { window.location.href = "stats.html"; }
-function goToAdmin()    { window.location.href = "admin.html"; }
+function goTo(page) { window.location.href = page; }
 </script>
 
 </body>
