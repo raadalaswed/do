@@ -1,6 +1,148 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style id="ra-lock-style">
+  /* قفل فوري: أخفِ كل محتوى الصفحة حتى انتهاء التحقق. لا يُخفى إلا محتوى الصفحة، أما كتلة الحماية فتبقى ظاهرة. */
+  html.ra-locked body > *:not(#ra-secure-block){ display:none !important; }
+  html.ra-locked{ overflow:hidden; }
+ 
+  #ra-secure-block *{ box-sizing:border-box; }
+  #ra-secure-block{
+    --ra-ink:#0b1120; --ra-surface:#ffffff; --ra-muted:#5b6472; --ra-line:#e5e9f0;
+    --ra-accent:#0ea5a4; --ra-accent-ink:#0b7d7c; --ra-danger:#dc2626; --ra-warn:#b45309;
+    --ra-field:#f6f8fb; --ra-shadow:0 24px 60px -20px rgba(11,17,32,.35);
+    --ra-radius:16px; --ra-font:"IBM Plex Sans Arabic","Segoe UI",system-ui,Tahoma,sans-serif;
+  }
+  #ra-secure-block{
+    position:fixed; inset:0; z-index:2147483000;
+    font-family:var(--ra-font); color:var(--ra-ink);
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  }
+  #ra-secure-block[hidden]{ display:none !important; }
+ 
+  /* طبقة التحقق الكاملة (تغطي كل شيء) */
+  .ra-scrim{
+    position:absolute; inset:0; display:grid; place-items:center; padding:24px;
+    background:
+      radial-gradient(1200px 600px at 85% -10%, rgba(14,165,164,.10), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(59,130,246,.08), transparent 55%),
+      #f2f5f9;
+    overflow:auto;
+  }
+ 
+  /* شاشة التحميل */
+  .ra-loading{ display:flex; flex-direction:column; align-items:center; gap:20px; text-align:center; }
+  .ra-spinner{
+    width:56px; height:56px; border-radius:50%;
+    border:4px solid var(--ra-line); border-top-color:var(--ra-accent);
+    animation:ra-spin .8s linear infinite;
+  }
+  @keyframes ra-spin{ to{ transform:rotate(360deg); } }
+  .ra-loading-text{ font-weight:600; font-size:18px; color:var(--ra-ink); }
+  .ra-loading-sub{ font-size:14px; color:var(--ra-muted); max-width:340px; line-height:1.7; }
+ 
+  /* البطاقات (تسجيل الدخول / التسجيل / الرسائل) */
+  .ra-card{
+    width:100%; max-width:440px; background:var(--ra-surface);
+    border:1px solid var(--ra-line); border-radius:var(--ra-radius);
+    box-shadow:var(--ra-shadow); padding:32px 28px; animation:ra-rise .35s cubic-bezier(.2,.7,.2,1);
+  }
+  @keyframes ra-rise{ from{ opacity:0; transform:translateY(12px); } to{ opacity:1; transform:none; } }
+ 
+  .ra-brand{ display:flex; align-items:center; gap:10px; margin-bottom:22px; }
+  .ra-brand-mark{
+    width:38px; height:38px; border-radius:11px; display:grid; place-items:center;
+    background:linear-gradient(135deg,var(--ra-accent),#2563eb); color:#fff; font-weight:700; font-size:15px;
+    box-shadow:0 8px 20px -8px rgba(14,165,164,.6);
+  }
+  .ra-brand-name{ font-weight:700; font-size:16px; letter-spacing:-.2px; }
+  .ra-brand-sub{ font-size:12px; color:var(--ra-muted); }
+ 
+  .ra-title{ font-size:22px; font-weight:700; margin:0 0 4px; letter-spacing:-.3px; }
+  .ra-lede{ font-size:14px; color:var(--ra-muted); margin:0 0 22px; line-height:1.7; }
+ 
+  .ra-field{ margin-bottom:14px; }
+  .ra-field label{ display:block; font-size:13px; font-weight:600; margin-bottom:7px; color:#2b333f; }
+  .ra-input{
+    width:100%; height:46px; padding:0 14px; font:inherit; font-size:15px; color:var(--ra-ink);
+    background:var(--ra-field); border:1.5px solid transparent; border-radius:11px; outline:none;
+    transition:border-color .15s, background .15s;
+  }
+  .ra-input::placeholder{ color:#9aa3b2; }
+  .ra-input:focus{ background:#fff; border-color:var(--ra-accent); }
+  .ra-input:disabled{ opacity:.6; cursor:not-allowed; }
+ 
+  .ra-btn{
+    width:100%; height:48px; border:0; border-radius:11px; cursor:pointer;
+    font:inherit; font-size:15px; font-weight:600; color:#fff;
+    background:linear-gradient(135deg,var(--ra-accent),var(--ra-accent-ink));
+    transition:transform .06s, box-shadow .15s, opacity .15s;
+    box-shadow:0 10px 24px -12px rgba(14,165,164,.9); display:flex; align-items:center; justify-content:center; gap:9px;
+  }
+  .ra-btn:hover{ box-shadow:0 14px 30px -12px rgba(14,165,164,.95); }
+  .ra-btn:active{ transform:translateY(1px); }
+  .ra-btn[disabled]{ opacity:.65; cursor:not-allowed; box-shadow:none; }
+  .ra-btn.ra-ghost{
+    background:transparent; color:var(--ra-accent-ink); box-shadow:none; height:auto; padding:0;
+    font-size:14px; width:auto; text-decoration:none;
+  }
+  .ra-btn.ra-ghost:hover{ text-decoration:underline; }
+  .ra-btn.ra-secondary{
+    background:var(--ra-field); color:var(--ra-ink); box-shadow:none;
+    border:1.5px solid var(--ra-line);
+  }
+ 
+  .ra-btn-spin{ width:18px; height:18px; border-radius:50%; border:2.5px solid rgba(255,255,255,.45); border-top-color:#fff; animation:ra-spin .7s linear infinite; }
+ 
+  .ra-row{ display:flex; align-items:center; justify-content:space-between; margin:6px 0 18px; gap:10px; flex-wrap:wrap; }
+  .ra-check{ display:flex; align-items:center; gap:8px; font-size:13.5px; color:#2b333f; cursor:pointer; user-select:none; }
+  .ra-check input{ width:16px; height:16px; accent-color:var(--ra-accent); }
+ 
+  .ra-alt{ text-align:center; margin-top:20px; font-size:14px; color:var(--ra-muted); }
+  .ra-alt a{ color:var(--ra-accent-ink); font-weight:600; cursor:pointer; text-decoration:none; }
+  .ra-alt a:hover{ text-decoration:underline; }
+ 
+  .ra-feedback{
+    display:none; align-items:flex-start; gap:9px; margin-bottom:16px; padding:12px 14px;
+    border-radius:11px; font-size:13.5px; line-height:1.6; border:1px solid transparent;
+  }
+  .ra-feedback.show{ display:flex; }
+  .ra-feedback.err{ background:#fef2f2; border-color:#fecaca; color:#991b1b; }
+  .ra-feedback.ok{ background:#ecfdf5; border-color:#a7f3d0; color:#065f46; }
+  .ra-feedback .ra-fi{ flex:0 0 auto; margin-top:1px; }
+ 
+  /* شاشات حالة الحساب / الرسائل */
+  .ra-state{ text-align:center; }
+  .ra-state-icon{
+    width:64px; height:64px; border-radius:18px; display:grid; place-items:center; margin:0 auto 18px;
+    font-size:30px;
+  }
+  .ra-state-icon.wait{ background:#fffbeb; color:#b45309; }
+  .ra-state-icon.stop{ background:#fef2f2; color:#dc2626; }
+  .ra-state-icon.ok{ background:#ecfdf5; color:#059669; }
+  .ra-state-reason{
+    margin-top:14px; padding:12px 14px; background:var(--ra-field); border:1px solid var(--ra-line);
+    border-radius:11px; font-size:13.5px; color:#2b333f; text-align:start; line-height:1.7;
+  }
+  .ra-state-reason b{ display:block; margin-bottom:4px; color:var(--ra-muted); font-weight:600; font-size:12px; }
+  .ra-state .ra-actions{ margin-top:22px; display:flex; flex-direction:column; gap:10px; }
+ 
+  @media (max-width:480px){
+    .ra-card{ padding:26px 20px; border-radius:14px; }
+    .ra-title{ font-size:20px; }
+  }
+  @media (prefers-reduced-motion:reduce){
+    #ra-secure-block *{ animation-duration:.001ms !important; }
+    .ra-spinner,.ra-btn-spin{ animation-duration:.8s !important; }
+  }
+</style>
+<script>
+  /* قفل فوري متزامن: يُنفَّذ قبل رسم الصفحة، فلا يظهر أي جزء منها ولو لجزء من الثانية. */
+  document.documentElement.classList.add('ra-locked');
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>🏆 دوري الدومينو</title>
@@ -688,6 +830,125 @@ onValue(ref(db, "tournaments"), (snap) => {
 <script>
 function goTo(page) { window.location.href = page; }
 </script>
-
+<div id="ra-secure-block" role="region" aria-label="حماية الصفحة">
+  <div class="ra-scrim">
+ 
+    <!-- (1) شاشة التحميل -->
+    <div class="ra-loading" data-ra-view="loading">
+      <div class="ra-spinner" aria-hidden="true"></div>
+      <div class="ra-loading-text" data-ra-loading-text>جاري التحقق...</div>
+      <div class="ra-loading-sub" data-ra-loading-sub>يرجى الانتظار قليلًا بينما نتأكد من صلاحية حسابك.</div>
+    </div>
+ 
+    <!-- (2) تسجيل الدخول -->
+    <div class="ra-card" data-ra-view="login" hidden>
+      <div class="ra-brand">
+        <div class="ra-brand-mark">RA</div>
+        <div>
+          <div class="ra-brand-name">RA Secure Block</div>
+          <div class="ra-brand-sub">تسجيل الدخول الآمن</div>
+        </div>
+      </div>
+      <h2 class="ra-title">تسجيل الدخول</h2>
+      <p class="ra-lede">أدخل بيانات حسابك للمتابعة إلى الخدمة.</p>
+ 
+      <div class="ra-feedback" data-ra-fb="login"><span class="ra-fi">⚠️</span><span data-ra-fb-text></span></div>
+ 
+      <div class="ra-field">
+        <label for="ra-login-email">البريد الإلكتروني</label>
+        <input class="ra-input" id="ra-login-email" type="email" inputmode="email" autocomplete="email" placeholder="name@example.com" />
+      </div>
+      <div class="ra-field">
+        <label for="ra-login-pass">كلمة المرور</label>
+        <input class="ra-input" id="ra-login-pass" type="password" autocomplete="current-password" placeholder="••••••••" />
+      </div>
+ 
+      <div class="ra-row">
+        <label class="ra-check"><input type="checkbox" id="ra-remember" /> تذكّرني</label>
+        <a class="ra-btn ra-ghost" data-ra-go="forgot">نسيت كلمة المرور؟</a>
+      </div>
+ 
+      <button class="ra-btn" data-ra-action="login">
+        <span data-ra-btn-label>تسجيل الدخول</span>
+      </button>
+ 
+      <p class="ra-alt">ليس لديك حساب؟ <a data-ra-go="register">إنشاء حساب</a></p>
+    </div>
+ 
+    <!-- (3) إنشاء حساب -->
+    <div class="ra-card" data-ra-view="register" hidden>
+      <div class="ra-brand">
+        <div class="ra-brand-mark">RA</div>
+        <div>
+          <div class="ra-brand-name">RA Secure Block</div>
+          <div class="ra-brand-sub">حساب جديد</div>
+        </div>
+      </div>
+      <h2 class="ra-title">إنشاء حساب</h2>
+      <p class="ra-lede">أنشئ حسابك، وسيتم تفعيله بعد موافقة الإدارة.</p>
+ 
+      <div class="ra-feedback" data-ra-fb="register"><span class="ra-fi">⚠️</span><span data-ra-fb-text></span></div>
+ 
+      <div class="ra-field">
+        <label for="ra-reg-name">الاسم الكامل</label>
+        <input class="ra-input" id="ra-reg-name" type="text" autocomplete="name" placeholder="الاسم كما تريد ظهوره" />
+      </div>
+      <div class="ra-field">
+        <label for="ra-reg-email">البريد الإلكتروني</label>
+        <input class="ra-input" id="ra-reg-email" type="email" inputmode="email" autocomplete="email" placeholder="name@example.com" />
+      </div>
+      <div class="ra-field">
+        <label for="ra-reg-pass">كلمة المرور</label>
+        <input class="ra-input" id="ra-reg-pass" type="password" autocomplete="new-password" placeholder="٦ أحرف على الأقل" />
+      </div>
+ 
+      <button class="ra-btn" data-ra-action="register" style="margin-top:6px;">
+        <span data-ra-btn-label>إنشاء الحساب</span>
+      </button>
+ 
+      <p class="ra-alt">لديك حساب بالفعل؟ <a data-ra-go="login">تسجيل الدخول</a></p>
+    </div>
+ 
+    <!-- (4) استعادة كلمة المرور -->
+    <div class="ra-card" data-ra-view="forgot" hidden>
+      <div class="ra-brand">
+        <div class="ra-brand-mark">RA</div>
+        <div>
+          <div class="ra-brand-name">RA Secure Block</div>
+          <div class="ra-brand-sub">استعادة الوصول</div>
+        </div>
+      </div>
+      <h2 class="ra-title">استعادة كلمة المرور</h2>
+      <p class="ra-lede">أدخل بريدك الإلكتروني وسنرسل إليك رابط إعادة التعيين.</p>
+ 
+      <div class="ra-feedback" data-ra-fb="forgot"><span class="ra-fi">⚠️</span><span data-ra-fb-text></span></div>
+ 
+      <div class="ra-field">
+        <label for="ra-forgot-email">البريد الإلكتروني</label>
+        <input class="ra-input" id="ra-forgot-email" type="email" inputmode="email" autocomplete="email" placeholder="name@example.com" />
+      </div>
+ 
+      <button class="ra-btn" data-ra-action="forgot">
+        <span data-ra-btn-label>إرسال الرابط</span>
+      </button>
+ 
+      <p class="ra-alt"><a data-ra-go="login">العودة لتسجيل الدخول</a></p>
+    </div>
+ 
+    <!-- (5) شاشة حالة الحساب / الرسائل (تُملأ ديناميكيًا) -->
+    <div class="ra-card ra-state" data-ra-view="state" hidden>
+      <div class="ra-state-icon wait" data-ra-state-icon>⏳</div>
+      <h2 class="ra-title" data-ra-state-title>—</h2>
+      <p class="ra-lede" data-ra-state-text style="margin-bottom:0;">—</p>
+      <div class="ra-state-reason" data-ra-state-reason hidden><b>سبب الرفض</b><span data-ra-state-reason-text></span></div>
+      <div class="ra-actions">
+        <button class="ra-btn ra-secondary" data-ra-action="switch-account">العودة لتسجيل الدخول بحساب آخر</button>
+      </div>
+    </div>
+ 
+  </div>
+</div>
+ 
+<script type="module">
 </body>
 </html>
